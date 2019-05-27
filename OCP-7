@@ -1,0 +1,289 @@
+database内置了sql developer
+/opt/oracle/product/11.2/db_1/sqldeveloper/sqldeveloper.sh
+
+column
+rownum 伪列
+
+select coun(1) from tbname
+返回速度很快，查找第一列，查rowid
+不扫描表
+rowid列
+
+;是断行的
+null
+
+
+SQL> create table nt(sq number, cont varchar(10));
+
+Table created.
+
+SQL> insert into nt values (1,'null');
+insert into nt values (2,'Null');
+insert into nt values (3,'NULL');
+insert into nt values (4,'');
+insert into nt values (5,null);
+insert into nt values (6,Null);
+insert into nt values (7,NULL);
+1 row created.
+
+SQL> 
+1 row created.
+
+SQL> 
+1 row created.
+
+SQL> 
+1 row created.
+
+SQL> 
+1 row created.
+
+SQL> 
+1 row created.
+
+SQL> 
+
+1 row created.
+
+SQL> 
+SQL> 
+SQL> commit;
+
+Commit complete.
+
+SQL> select count(1) from nt;
+
+  COUNT(1)
+----------
+         7
+
+SQL> select * from nt;
+
+        SQ CONT
+---------- ----------
+         1 null
+         2 Null
+         3 NULL
+         4
+         5
+         6
+         7
+
+7 rows selected.
+
+SQL> select distinct(cont) from nt;
+
+CONT
+----------
+Null
+
+null
+NULL
+
+SQL> 
+
+
+
+java 拼sql null会给加上引号
+
+
+java拼接sql
+
+
+dual
+
+伪表：内存中的表
+
+select 1+1/(2.3) from dual;
+计算仅限数值型计算型计算
+计算也可以放在where条件里面
+
+
+SQL> select id,'a' from test;
+
+	ID '
+---------- -
+	 1 a
+
+aliases
+
+select id as "this is the new name" from test;
+select id "this is the new name" from test;
+
+""强制引用，内容不可替换
+单引号 内容可以替换
+select 'alter index'|| index_name || ' rebuild online;' from dba_indexes
+where table_name like ='USER$';
+
+写到游标里面就可以执行 
+
+
+日期要加单引号
+
+
+拼接日期
+
+日期也会拼接
+年 月 日
+
+
+quote operator
+自定义引用符
+select department_name || q'# Manager's: #' || manage_id from tbname
+
+q'#         #'
+
+
+只扫第一行，遇到相同的就不骚了
+distinct 
+sql 传给数据库服务,然后PGA,然后SGA
+sql engine在share pool
+
+
+字典表里存储的表名都是大写
+
+oracle with as
+
+
+with tmp as(
+select upper(last_name) ls,job_id from tbname
+)
+select * from tmp from ls='ABEL';
+
+
+
+select last_name from tbname where upper(last_name)='AA';
+
+
+alter session set nls_date_format='yyyy-mm-dd hh24:mi:ss';
+
+
+
+select sysdate from dual;
+tochar
+
+select to_char(sysdate,'yy-DD-mm') from dual;
+
+
+in 相当于数组
+
+is null
+
+
+in
+not in 
+
+
+
+
+OR AND 组合
+
+先跑AND再跑or
+
+LPAD(salary,10,'*')
+
+日期是特殊的number,可以进行运算
+
+
+select t_char(sysdate,ddsp) from duail;
+
+NVL()
+NVL2()
+NULLIF()
+
+
+decode和case then一样的意思，只是写的简洁
+
+
+分组函数
+avg(NVL())
+
+NULL行不计入avg.
+包含组函数的条件，条件用having,写在group by后面
+
+
+natural join，有主外键关系
+两个表没有重叠的字段
+
+
+using(xx) 等价于 where a.xx=b.xx
+用了别称了，就不能用using了
+
+on(xx)
+
+
+多表查询条件：on using where
+
+a
+join b
+on a.xx=b.xx
+join c
+on b.xx=c.xx
+
+
+from a b c where a.xx=b.xx and b.xx=c.xx
+
+
+
+自己和自己关联
+
+
+把没有关联的表，连接起来
+
+left join 
+right join
+
+是指以left/right表为基准
+
+
+
+
+full join
+
+
+工作中避免笛卡尔积
+
+
+左边表的一行匹配右边表的所有行。
+
+无视关联系的
+
+
+
+
+子查询：在查询里面套一个查询
+select last_name from employee where last_name=(select last_name from )
+每次查询，子查询都再跑一遍查询
+绑定变量
+
+> all(1,2,3)
+< all(1,2,3)
+> any(1,2,3)
+< any(1,2,3)
+
+
+any 就是匹配集合中的任意一个就满足条件了；而 all 要跟所有的都比较，所有都满足以后才为真。
+
+union去重
+
+select a,b from tb1 
+union
+select a,b from tb2;
+把两个结果都打出来
+把1,2,3月份的报表联合查出来
+
+
+字段类型，字段名称一定要一样
+如果字段不一致，就自己补上
+select a,b,c from tb1 
+union
+select a,b,'' from tb2;
+
+
+
+minus:减
+
+
+
+
+
