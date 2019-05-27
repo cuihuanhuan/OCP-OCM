@@ -1,0 +1,202 @@
+index也是一张表和数据表不在一个表空间，在附属表空间等
+bitmap index加锁
+
+
+B-Tree Index
+create index tbn_unique_idx on hr.employees(employee_id);
+索引不要随便起名字了,用tbn_idx 
+
+unique index
+reverse key index 键值反转索引
+310-110-1981010-11115
+1981010-11115       
+针对表TEST02的empno列，添加反向索引
+SQL> create index PK_REV_TEST02 on TEST02(EMPNO) REVERSE;
+Index created.
+
+composite index   多列组合索引，多少列随便
+function-based index 函数索引
+select sun(xx) from tbn
+数据库预置几百个函数
+把函数处理写到索引里面
+
+
+
+
+compressed index
+create index objects1_idx on objects1 (object_id) compress 1;
+存放的时候去重，存放的时候有重复做个标记，不存了
+
+
+随便建一个索引不一定有效率
+
+ASC  DESC
+ascending descendng
+
+视图
+预存的SQL，不是表
+
+动态性能视图  v$ gv$  _开头
+view 普通视图
+snapshot(9i)
+物化视图(9i之后)
+把视图的结果保存在表里
+
+简单view:从一张表select
+复杂view：从多张表select
+
+有些表计算量少，用不到存储过程
+简单的报表用view来制作，不需要很多中间数据产生的
+
+create view as
+
+
+
+
+
+sequence是session级别的
+每个session自己拿
+
+
+ACID
+数据库事务正确执行的基本要素
+
+原子性
+一致性
+隔离性
+持久性
+
+
+
+
+
+
+
+函数只能在sql中调用
+procedure可以在外部调用
+
+package可以包含function procedure
+
+desc dbms_stats
+desc dbms_stats.gather_schema_stats('HR');
+
+
+
+spool /home/oracle/sp.log
+desc dbms_stats --查看包头
+
+https://www.cnblogs.com/leohahah/p/7039907.html?tdsourcetag=s_pctim_aiomsg
+锁分两种：数据锁 字典锁
+
+并行有关的参数
+show parameter parallel
+
+
+表开并行
+alter table test parallel 8;
+
+
+
+
+
+
+
+
+
+
+
+
+select /* +parallel*/ field from 
+
+
+
+oracle OS验证
+
+
+
+审计
+基于值得审计
+细粒度审计
+show parameter audit
+
+开审计，写xml，空间满
+
+
+
+alter system set audit_trail=db_extended scope=spfile;
+
+重启生效
+
+
+
+audit select any table by hr by session;
+
+
+
+
+
+
+select db_user from dba_common_audit_trail where db_user='HR';
+
+
+
+
+
+
+
+
+
+
+
+
+Fine-Grained Auditing
+只针对增删改进行审计
+细粒度审计跑 DBMS_FGA
+
+
+
+
+
+show parameter audit;
+
+
+select  count(*) from aud$;
+
+
+
+audit_trial :DB
+os会写到audit_file_dest文件夹下
+
+
+
+desc dbms_fga；
+select username,sql_text from dba_audit_trail where username='HR';
+
+
+
+
+alter system set audit_trail=db_extended scope=spfile;
+
+
+begin
+dbms_fga.add_policy(
+ OBJECT_SCHEMA=>'HR',
+ OBJECT_NAME=>'employees',
+ POLICY_NAME=>'audit_emp',
+ AUDIT_CONDITION=>'department_id=10',
+ AUDIT_COLUMN=>'salary,commission_pct',
+ ENABLE=>true,   
+ STATEMENT_TYPES=>'SELECT,UPDATE'
+); 
+end;
+/
+
+
+SELECT first_name, salary  FROM hr.employees  WHERE  department_id = 10;
+
+update hr.employees  set salary=4444 where department_id = 10;
+
+
+
+http://blog.itpub.net/25744374/viewspace-775678/
+dba_fga_audit_trail
