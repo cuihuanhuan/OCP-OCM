@@ -1,0 +1,225 @@
+sys权限
+对象权限
+回收权限不一样
+
+创建用户加密方法
+
+user profile：概要文件 用户属性文件
+给用户资源属性做个限制
+用户组
+角色 role
+不指定用户表空间，默认是system用户
+记录表信息
+记录当前数据库运行状态的
+
+动态性能视图
+v$
+gv$
+_开头异常表
+sys system权限区别：system不具备开关库权限
+有些操作必须用sys操作：AWR
+
+
+数据库验证方式：
+sqlplus t1/t1 as sysdba
+show user
+sys
+用的操作系统权限(OS验证)
+ldap  域
+
+多台机器组成一个域
+域控服务器，登录前都去域控服务器上验证
+
+sysoper(用的不多)
+sysasm(管理asm的最高权限)
+预先配置好的角色，权限
+密码文件：rman 数据库复制技术
+密码文件只存在sys用户的密码，在文件系统上，远程访问会调用
+oracle大小写敏感
+expired
+
+系统权限
+对象权限
+
+SQL：
+DML：增删改查 数据操纵语言
+对表的数据进行增删改查
+DDL：数据定义语言
+建对象，设置游标，数据库性能状态调整
+
+和DDL有关的是system权限：针对数据库对象，资源
+和DML有关的是object权限:针对某一个表
+
+
+赋权限：
+grant create table to 
+
+create session最基础的权限
+
+
+revoke权限：
+revoke create table from 
+
+
+
+
+with admin option，权限转授其他用户
+
+dba----with admin option----t1
+t1-----with admin option----t2
+t2---------------------------t3
+
+admin option :代理人
+
+
+回收权限：t2 t3会受到影响
+系统权限admin option，收不回来
+
+grant option 对象权限
+
+grant select on tbname to 
+
+grant select to tbname to xx with grant option
+
+grant select on sys.test to xx2
+
+revoke select on sys.test from xx
+xx2对象权限也收回了
+
+
+
+
+
+role：一组权限的组合
+
+为什么引进role
+
+
+SELECT TABLE_NAME FROM DICT WHERE TABLE_NAME LIKE '%PRIV%';
+
+
+
+SQL> SELECT UNIQUE(USERNAME) FROM USER_SYS_PRIVS;
+
+USERNAME
+------------------------------
+SYS
+
+
+
+SQL> SELECT COUNT(1) FROM USER_SYS_PRIVS;
+
+  COUNT(1)
+----------
+       200
+
+grant connect,resource 
+
+resource是role：建表 删除表 增删改查
+
+
+profile
+
+
+
+
+SQL> select table_name from dict where table_name like '%PROFILE%';
+
+TABLE_NAME
+------------------------------
+DBA_PROFILES
+DBA_SQL_PROFILES
+
+SQL> DESC DBA_PROFILES;
+ Name					   Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ PROFILE				   NOT NULL VARCHAR2(30)
+ RESOURCE_NAME				   NOT NULL VARCHAR2(32)
+ RESOURCE_TYPE					    VARCHAR2(8)
+ LIMIT						    VARCHAR2(40)
+
+
+SQL> SELECT username,PROFILE FROM dba_users;
+
+USERNAME		       PROFILE
+------------------------------ ------------------------------
+
+T1			       DEFAULT
+HUAN1			       DEFAULT
+T2			       DEFAULT
+
+
+grace time
+password reuse
+
+
+SQL> select resource_name,limit from dba_profiles;
+
+PASSWORD_VERIFY_FUNCTION
+
+属于某一个用户在数据库中的所有对象的集合：用这个用户的名字表示
+
+
+sys是schema
+
+索引也是一种表，nosql那种表，只记录key value
+以及value在原表的位置
+
+
+
+
+view
+普通视图，动态性能视图，物化视图
+预存的复杂的sql语句
+11g之前叫快照，11g之后叫物化视图
+把预存的复杂的sql语句结果放到一个表里，加速查询
+
+
+外部表会调用directory
+dbms
+csv：扁平数据文件
+json：扁平数据接起来
+xml：数据以标签格式存储在数据库
+可移植性高
+跨平台
+
+xmltype index
+
+primary key：not null unique index
+
+为什么加约束：防止垃圾数据的输入
+
+
+单独和复合字段组成主键
+主从表级联删除(DDL)
+on delete cascade
+
+
+检索索引数据占据总表的4%是多少是最高效
+索引数据占据总表的4%是多少是最高效
+
+
+
+
+索引类型：
+两叉数 B-tree
+
+Bitmap index
+
+hash索引
+
+函数索引
+组合索引
+
+簇表
+
+iot表是簇表的一种
+
+
+交易型数据库
+数据仓库
+
+bitmap用于数据仓库，跑报表
+
+
+bitmap会锁多行，在线交易系统不用bitmap index
