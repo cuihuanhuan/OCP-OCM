@@ -1,0 +1,350 @@
+select id,day,versions_operation,versions_xid,versions_starttime
+from tbname versions between timestamp minvalue and maxvalue;
+从undo表空间里面读取的
+
+版本的查询
+
+超过undo_retention_后就查不到了。
+
+
+I
+D
+VERSIONS_XID
+每个事务的编号，commit有一个事务的编号
+
+事务有开始时间和结束时间
+
+一般写sql，括号先括好
+select * from tnamee as of timestamp (to_timestamp(2019-05-25 11：21：21，'yyyy-mm-dd hh24:mi:ss');
+
+select current_scn from v$database;
+
+select * from tbname as of scn current_scn;
+
+
+基于undo可以查出某个时间点做了什么事情
+
+
+select * from fb minus
+select * from fb1 as of scn 1243729;
+
+
+版本查询
+
+什么时候做了什么事情，干了什么。
+
+
+
+sys.smon_scn_time 1440个时间记录
+
+undo_retention_
+
+undo表空间最多能记录的时间
+
+伪劣ORA_ROWSCN
+
+
+
+ROWNUMB
+
+ROWID
+
+ORA_ROWSCN：这一行什么时候插入，变动
+
+
+select rowid,rownum,id,day,ora_rowscn from tbname;
+
+
+
+事务查询需要加最小补充日志
+最小补充日志
+alter database add supplemental log data;
+把最小补充日志里面基于主键和索引的记录打开
+alter database add supplemental log data(primary key,unique index) columns;
+
+desc flashback_transaction_query;
+增删改查对应undo的sql语句
+
+
+历史版本查询
+
+根据事务查找
+select xid,
+       commit_scn,
+       commit_timestamp,
+       operation,
+       undo_sql
+  from flashback_transaction_query q 
+ where q.xid in(
+                select versions_xid 
+                  from B
+                versions between scn 1249636 and 1249736);
+
+闪回版本查询
+闪回事务查询
+
+最小补充日志是补充的redo的日志
+
+undo也有归档，undo flashback archive
+
+如果不开最小补充日志，undo_sql没有数据
+
+
+闪回事务：是逻辑的
+
+
+一旦做了闪回，你就覆盖了，其他日志闪回不了
+
+
+
+闪回只能闪回一次，回到某一个点，重置redolog。不能再跳了
+
+
+create table tbname (id number) rowdependence;
+
+
+alter table tbname modify column id number rowdependencies;
+
+高级功能后期不可以修改的要在建表的时候加
+rowscn超过一定范围就没有了
+
+
+
+analyze table b compute statistics;
+exec dbms_stats.gather_table_stats('HR','FB1');
+表头信息，
+所有表都有表头，里面有优化器
+一条sql的执行不考虑任何因素，一行一行执行
+对于很大的表，有数据筛选的，走不走索引，优化器。
+自动判断的cpo  
+
+块信息都在块头
+pctfree
+
+表有头部信息
+
+
+
+收集表的信息
+dbms_stats.get_table_stats,数据收集完后，给优化器
+
+
+闪回丢弃
+
+
+
+
+系统用户把某个表丢弃，是闪回不来的
+
+
+show user
+show parameter recyclebin;
+
+
+sys用户drop 表恢复不了。
+
+
+可以通过日志挖掘找回来
+
+
+
+查询回收站
+
+show recyclebin;
+select * from user_recycebin;
+
+
+select * from user_recyclebin;
+
+
+表在回收站可以查
+
+
+select * from "回收站的表名";
+
+
+alter table fb2 rename fb1;
+
+
+
+flashback table "回收站里面的recyclebin name" to before drop;
+
+flashback table "" to before drop rename to fb1_1;
+
+
+show recyclebin;
+purge recyclebin;
+show recyclebin;
+
+
+
+删除表，不进回收站
+
+drop table fb1 purge;
+
+show recyclebin;
+
+
+闪回表：recylebin的技术
+
+
+
+
+
+sys用户
+
+
+desc dba_recyclebin;
+
+
+
+show dba_recyclebin;
+
+
+show recyclebin;没有回收站
+
+
+闪回表的数据从数据库里面拿的。purge掉才会释放数据块。
+
+
+
+闪回事务和时间查询
+
+闪回表
+alter table test enable row movement;
+
+所有的数据块都是链表形式存在的，把block块全部移过来就是行迁移
+
+根据时间版本，来恢复
+
+
+alter table fb1 enable row movement;
+
+select current_scn from v$database;
+
+
+
+
+select sysdate from dual;
+
+
+
+
+
+
+select to_char(sysdate,'yyyy-mm-dd hh24:mi:ss) from dual;
+alter table tbname rename to fb1;
+
+delete from fb1 where id<30;
+commit;
+flashback table fb1 to scn 1259287;
+把undo表空间的数据挪过来
+
+
+
+闪回是很多
+
+
+undo表空间
+
+版本查询，事务查询，表的闪回
+
+
+闪回是一些技术的综合。
+
+
+闪回只能一次
+
+
+flashback table xx to scn 1234；
+flashback tbale xx to scn 4567;
+
+
+闪回从undo里面获取的
+
+闪回是从不同的表空间把数据挪过来，接在表后面，需要开启行迁移
+
+
+统计信息不会闪回，因为数据在undo表空间，物理位置变了
+
+手动执行，生成统计信息。
+
+undo数据是旧的数据的
+
+dml不释放表空间。
+
+所有块都是指针相连的，标记为删除。
+
+truncate表释放表空间
+
+
+把undo表空间的数据是挪过来，是行迁移行链接，把数据挪过来。
+
+在表后面开辟一块空间，把undo的数据写过来。
+
+行链接和行迁移是一个东西
+
+undo_retention undo保护时间
+
+
+oracle有哪些组件
+
+undo表空间的管理，默认保存15分钟
+
+
+create undo tablespace new_undo01 datafile '/xx/yy/' size 100M autoextend on extent management local;
+
+
+修改默认表空间
+
+alter system set undo_tablespace=new_undo01;
+
+startup force;
+
+
+alter tablespace new_undo01 retention guarantee;
+
+show parameter undo;
+
+
+
+alter system set undo_retention=3600;
+
+
+表空间一定要auto extend on;
+
+
+
+闪回数据归档
+
+
+undo有表空间和时间的限制。
+持久化：归档
+
+
+某张表对应undo存放在指定的表空间里面。
+
+FBDA
+create tablespace fratbs
+datafile '/u01/app/oracle/oradata/PROD1/fra01.dbf' size 50M autoextend on
+extent management local;
+
+create user fra_adm identified by oracle default tablespace fratbs;
+grant resource,connect,flashback archive administer to fra_adm;
+conn fra_adm/oracle
+
+
+create flashback archive fra tablespace fratbs retention 5 year;
+
+alter table 用户.表名 flashback archive fra;
+
+
+
+
+闪回：
+版本，事务查询
+回收站恢复
+闪回表(undo)
+持久化的闪回：闪回归档
+
+
