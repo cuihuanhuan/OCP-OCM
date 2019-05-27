@@ -1,0 +1,503 @@
+oracle sid
+连接到某一个实例
+ps -ef|grep smon
+smon_xxx
+export ORACLE_SID=xxx
+
+
+cd $ORACLE_HOME/dbs
+
+export ORACLE_SID=xxx
+
+ps -ef|grep smon;
+
+rman也有实例
+rman target /
+
+export ORACLE_SID=yy
+
+rman target /
+
+target：目标数据库
+
+
+用rman，数据库必须是归档模式
+
+
+show parameter archive_log_dest_1;
+
+
+startup mount;参数文件加载
+
+
+
+netmgr:静态注册监听
+
+通过监听去连
+rman target sys/oracle@orcl
+
+
+rman >
+backup database;把数据库做个全备
+
+
+RMAN> backup database;
+
+Starting backup at 18-MAY-19
+using target database control file instead of recovery catalog
+allocated channel: ORA_DISK_1
+channel ORA_DISK_1: SID=73 device type=DISK
+channel ORA_DISK_1: starting full datafile backup set
+channel ORA_DISK_1: specifying datafile(s) in backup set
+input datafile file number=00011 name=/u01/app/oracle/oradata/orcl/orclpdb/undotbs01.dbf
+input datafile file number=00012 name=/u01/app/oracle/oradata/orcl/orclpdb/users01.dbf
+input datafile file number=00010 name=/u01/app/oracle/oradata/orcl/orclpdb/sysaux01.dbf
+input datafile file number=00009 name=/u01/app/oracle/oradata/orcl/orclpdb/system01.dbf
+input datafile file number=00015 name=/u01/app/oracle/oradata/orcl/orclpdb/test.dbf
+input datafile file number=00017 name=/u01/app/oracle/oradata/orcl/orclpdb/example.dbf
+input datafile file number=00016 name=/u01/app/oracle/oradata/orcl/orclpdb/test2.dbf
+channel ORA_DISK_1: starting piece 1 at 18-MAY-19
+channel ORA_DISK_1: finished piece 1 at 18-MAY-19
+piece handle=/u01/app/oracle/product/11.2.0/db_1/dbs/0au1s7vq_1_1 tag=TAG20190518T164025 comment=NONE
+channel ORA_DISK_1: backup set complete, elapsed time: 00:01:55
+channel ORA_DISK_1: starting full datafile backup set
+channel ORA_DISK_1: specifying datafile(s) in backup set
+input datafile file number=00003 name=/u01/app/oracle/oradata/orcl/sysaux01.dbf
+input datafile file number=00007 name=/u01/app/oracle/oradata/orcl/users01.dbf
+input datafile file number=00001 name=/u01/app/oracle/oradata/orcl/system01.dbf
+input datafile file number=00004 name=/u01/app/oracle/oradata/orcl/undotbs01.dbf
+input datafile file number=00018 name=/u01/app/oracle/oradata/orcl/test.dbf
+channel ORA_DISK_1: starting piece 1 at 18-MAY-19
+channel ORA_DISK_1: finished piece 1 at 18-MAY-19
+piece handle=/u01/app/oracle/product/11.2.0/db_1/dbs/0bu1s83f_1_1 tag=TAG20190518T164025 comment=NONE
+channel ORA_DISK_1: backup set complete, elapsed time: 00:01:35
+channel ORA_DISK_1: starting full datafile backup set
+channel ORA_DISK_1: specifying datafile(s) in backup set
+input datafile file number=00006 name=/u01/app/oracle/oradata/orcl/pdbseed/sysaux01.dbf
+input datafile file number=00005 name=/u01/app/oracle/oradata/orcl/pdbseed/system01.dbf
+input datafile file number=00008 name=/u01/app/oracle/oradata/orcl/pdbseed/undotbs01.dbf
+channel ORA_DISK_1: starting piece 1 at 18-MAY-19
+channel ORA_DISK_1: finished piece 1 at 18-MAY-19
+piece handle=/u01/app/oracle/product/11.2.0/db_1/dbs/0cu1s86e_1_1 tag=TAG20190518T164025 comment=NONE
+channel ORA_DISK_1: backup set complete, elapsed time: 00:00:15
+Finished backup at 18-MAY-19
+
+Starting Control File and SPFILE Autobackup at 18-MAY-19
+piece handle=/u01/app/oracle/product/11.2.0/db_1/dbs/c-1530490664-20190518-00 comment=NONE
+Finished Control File and SPFILE Autobackup at 18-MAY-19
+
+
+
+
+list backup：查看备份信息
+
+备份文件打包了，*.bkp
+
+快速恢复区
+fast_recovery_area:FRA
+
+
+show parameter recovery;
+db_recovery_file_dest_size,备份的大小超过这个大小，数据库被hang住
+db_recovery_file_dest：备份路径
+
+report schema：打报告，当前数据库包含的内容和大小。
+
+
+
+rman命令打错了会提示错误，看错误信息
+
+
+数据库hang会很麻烦？
+
+
+配置FRA
+alter system set db_rescovery_size
+
+alter system set db_rescovery_dest
+
+
+
+rman对部件进行单独的备份
+
+backupset:
+
+
+backup指定的datafile数字,tablespace
+
+
+
+
+autobackup:
+
+
+rman备份信息，在没有使用rman数据库时一些备份信息记录在控制文件
+
+
+
+
+archivelog
+
+单独对归档文件进行备份
+
+rman>
+backup database,并不是完全的备份，完整的备份是有参数文件，密码文件的
+
+
+
+FRA区超过数据库设置的值，数据库会hang住
+
+
+
+
+select name,storage_size from  v$restore_point;
+闪回数据库开了，才有返回
+
+
+
+select * from v$recovery_file_dest;
+
+闪回区存放内容的大小
+select * from v$flash_rescovery_area_usage
+
+backup as copy tablespace users;
+
+
+backup as copy database;热备份：数据库没关，和backup database的内容不同，相当于完全复制，直接可以用，不用rman做恢复
+
+
+
+
+alter system set log_archive_log_dest
+
+
+catalog start with '文件夹'
+
+整个文件夹注册
+
+
+备份信息的注册和恢复
+
+
+控制文件的存放：一式三份
+
+控制文件的多路
+
+
+show parameter control
+
+
+control_files
+
+
+alter system set control_files='/ddd./ddd/','/ddd/' scope =spfile;控制文件重启才生效
+
+关库,cp
+!cp 
+控制文件有个scn,实时在记录的，所以需要关库
+
+
+
+控制文件多路
+
+
+online log:redo
+
+
+怎么看redo信息
+
+desc v$log;
+
+切redo
+alter system swith logfile;
+
+redo有几个状态
+
+
+select group#,status,members from v$log;
+
+
+
+current:正在被占用
+active:redo被记录到归档
+inactive:归档完成了
+
+alter system switch logfile;
+
+
+alter system archive log current;
+
+
+
+
+
+添加logfile组
+
+
+
+
+
+
+delete backupset bp号码
+
+
+delete backup tag='xxxxx';
+
+list achivelog all 
+
+
+
+backup achivelog all delete input;
+
+crosscheck backup;
+list expired backup;
+delete expired backup;
+
+
+
+
+list 
+
+
+要做恢复，必须要backup as copy过
+
+list copy of datafile 5
+desc dba_data_files;
+select file_id,file_name,status from dba_data_files;
+
+
+rm -rf users01.dbf
+
+等同于在rman里面调用sqlplus
+rman>
+sql 'alter database datafile 3 offine';
+
+
+实例开启状态，怎么操作都没啥大问题（删除表空间），只是下次启动不了
+
+数据库恢复一定要到mount状态
+
+
+
+
+swith datafile 3 to copy;
+
+
+alter database open;
+
+
+整库恢复
+catalog start with  '文件夹'
+
+restore database;
+
+
+
+做单独数据库文件恢复
+
+undo表空间重新建一个就好，不用恢复
+
+
+select status from v$instance;
+
+alter database open
+
+不完整的数据恢复,指定scn恢复
+
+控制文件和数据文件头不一致,恢复
+
+rman backup copy
+
+rman>
+restore database util scn 1155339
+recover database util scn 115539
+sql>
+alter database open resetlog;重置redo
+
+
+startup force;
+
+归档丢失导致数据文件和控制文件不一致
+
+switch datafile x to copy
+
+recover datafile x  追日志
+
+
+FRA
+
+
+backup database include current include
+
+show all;所有rman需要运行和配置的参数
+
+
+改REDUNDANCY:有效备份，做了两次备份，这里设置1，那最后一次有效，上一次是过期的
+
+rman>
+configure retention policy to redundancy 2;
+
+
+
+
+
+
+
+configure backup optimization on;
+
+sql>
+alter database enable block change tracking using 
+
+
+
+
+backup current controlfile;
+
+backup achivelog all
+
+
+rman>
+host '':执行操作系统的命令
+
+
+
+
+
+rman敲一个命令回车，后面跟的参数，都会提示
+
+
+整库备份脚本
+
+export ORACLE_SID=ORCL
+rman target / <<EOF
+run{
+backup database format '/u01/bk/%d_%U.full';
+sql 'alter system switch logfile';
+backup archivelog all format '/u01/bk/%d_%U.arc' delete input;
+backup current controlfile format '/u01/bk/%d_%U.ctl';
+}
+EOF
+
+
+创建动态命令文件
+
+
+autoback备份和恢复
+
+restore spfile from autobackup;备份控制文件和参数文件
+rman>
+connect target /
+
+
+
+
+
+rman>
+startup nomount;
+
+restore spfile from autobackup;
+restore controlfile from autoback;
+
+alter database mount;
+
+
+
+
+和恢复无关的要mount
+和恢复有关的要nomount
+
+recover database;让控制文件同步一下
+alter database open resetlogs;追日志
+
+自动备份的控制文件要落后于实际的控制文件。
+
+
+
+startup dba pfile=*.ora;指定参数文件启动
+
+
+
+
+
+rman checksyntax:检查语法，不跑
+
+
+
+rman checksyntax  @*.sh (rman的脚本)
+*.sh
+run{
+
+}
+
+
+
+rman help=y;
+
+
+checksyntax路径不能检查
+
+查看帮助都用help=y
+rman help=y  :y是yes的意思
+
+rman会有session
+
+
+host；退出rman,返回shell
+
+
+rman serssion
+
+ps -ef|grep ora
+
+oracle     5871   5866  1 19:31 ?        00:00:00 oracleorcl (DESCRIPTION=(LOCAL=YES)(ADDRESS=(PROTOCOL=beq)))
+oracle     5872   5866  0 19:31 ?        00:00:00 oracleorcl (DESCRIPTION=(LOCAL=YES)(ADDRESS=(PROTOCOL=beq)))
+
+
+
+
+select * from  v$rman_configuration;
+恢复成默认值
+configure backup optimization clear;
+
+
+alter system set skip_unusable_indexes=false;
+
+show parameter skip_unusable_indexes;
+重置参数
+alter system reset
+
+
+alter system set control_file_record_keep_time=15;
+
+备份的时候会产生日志
+
+
+在备份过程中有业务，那会产生日志
+
+
+redo 和归档时间不一致，switch log，促使redo写归档，使得归档和redo时间点一致
+
+
+
+configure backup optimization 
+
+backup tablespace users format '/home/oracle/bak/users_%d_%U.tbs' tag 'my_user_tb_bk';
+
+
+list schema;
+
+backup datafile 4 format 'home/oracle/4_%d_%U.df'  tag 'd4'
+
+
+delete 
+backup datafile 4 format '/home/oracle/bk/4_%d_%U.df' tag '5-1' keep forever;
+
+backup datafile 4;
+
+
+
+list backup
+
+
+rman基础使用
+数据的备份和恢复
