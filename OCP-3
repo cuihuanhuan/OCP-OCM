@@ -1,0 +1,605 @@
+etc
+. oraenv
+cd /u01	app/oracle/oradata/实例名/数据文件
+cd $ORACLE_BASE
+oracle环境变量都大写
+fast_recovery_area:闪回
+admin:oracle数据导入导出
+scripts:初始化数据库的脚本
+products:oracle数据库软件安装的位置
+sqldeveloper：图形化界面
+操作系统层面看数据库
+OS file(操作系统的文件，基于操作系统的数据库块)
+ls 
+
+inode
+操作系统层面：给你一个
+inode:文件记录的块的链接，告诉文件存放在哪
+文件存储单位：block:存放文件的数据块
+
+cd @RACLE_HOME
+*.dbf:数据文件
+*.ctl:控制文件
+strings control01.ctl:抽对象文件的字符串
+*.dbf:就像一个压缩文件
+*.ctl文件内容不能修改
+
+
+一个表空间可以包含多个数据文件
+多个表空间组成数据文件
+
+segment段：一张表(excel的两维表，一张表有列和行，一个小格子叫data block,存数据，8k bit位。
+数据多了，跨多个块，多个块组成一个区，区相当于一行
+表或区或块保留一块区域存储信息。使用率，这些信息都存在对应数据的前面的空间
+oracle高深的性能优化，统计信息收集，那些信息就是块或区前面的信息，
+频繁的删增改查，前面的信息不准确，需要重新收集。)
+extent区：
+oracle data block块：
+dbed 数据库的数据块修改工具
+抓取数据库的dump，一定取件block范围内的数据
+
+数据库不只是存表还有很多对象
+
+
+
+
+所有存储单元，前面都有一块数据
+high water mark 水位线,oracle的机制，oracle数据库是8k,数据库默认参数文件配置的。默认是8k,可以指定大小，和硬件存储能力有关
+oracle官方一定要大于操作系统的块的大小。
+操作系统一块是500k,4k一个块的大小
+块：一次IO发生读取数据读多少
+随着运算能力增强，不一定读一个块
+oracle一次能读8K，能去4k,那发生多次io，性能低
+asm是自己去管理数据文件读写IO.
+oracle块只增加不减少
+oracle block都有block head
+一个block数据
+一个打包好的数据2G放到磁盘上，有几万个小文件，存储不只是2个G,操作系统有一定的保留空间。seg free
+一个数据块存放的数据不够，需要再加一块block，链表，记录指针，下一个block的地址
+数据结构：链表，link-list，链表是先进先出，后进后出，先进后出。后进先出。
+缩表：磁盘整理
+truncate表。只保留表的表头信息
+一个数据文件只能属于一个表空间
+
+oracle历史发展：
+表空间的的管理
+local managed tablespace
+dictionary managed tablespace
+9i开始的
+
+表空间有头部信息，使用和占用了多少。
+这些信息存在于system表空间，不放在数据文件里面
+有好处有坏处：空闲空间，
+数据块的损坏
+运行效率降低
+local manage，本地信息存在本地表空间
+
+位图表示到底有多少空闲的extents
+0和1，就叫做位图
+0：空的
+1：代表被占用
+
+通过一个字符串表名占用和没被占用
+
+每一个数字代表一个块
+ dictoinary-manage tablespace,不考
+ 默认是local manage
+ 
+ 
+em:oracle数据库本身有个图形化的管理界面
+web端管理界面
+11g很强大
+oracle从11g以后单独把em拿出来，cloud manage
+
+作为一个产品，单独拿出来卖，管理多个数据库的多个实例
+只要是oracle的产品都能接管
+
+em稳定性有点问题
+dba不怎么用
+表空间要背过，作用不同，
+system，只要system在就有机会恢复
+所有的数据文件都可以坏，只要system在。system没了，数据库实例就启动不起来了
+oracle有一套完整的日志机制
+undo redo
+office
+users自定义
+example:样本库
+temp:临时表空间，操作系统的缓存。相当于swap交换分区
+只要system在，数据库照样能启动
+
+
+数据文件有status
+表空间也有stattus
+多个数据文件，每个文件状态都不一样的
+
+
+AUTOEXTEND：工作中不建议打开
+表空间如果一旦满了，数据库写不进去了
+把autoextend打开，就把表空间扩展，生产不建议开，如果数据库，olap交易型数据库，订票订座，
+频繁插入，发生磁盘空间不足，一个磁盘用之前格式化操作。很消耗IO性能的操作。瓶颈就是IP
+传统硬盘的数据库的很多瓶颈都是IO
+加文件，格式化，影响交易，所以关闭autoexntended，dba每天查表空间
+核心库3TB,每天扩20G空间。
+扩完后的大小。
+扩完后的大小。扩完后
+oltp没有频繁操作，跑报表的
+
+extent allocation:自动表空间的分配
+空间分配完了，每次给多少空间，最小单位是KB
+不能确定交易频繁，大的表空间要格式化，小的空间需要频繁的加，也要等
+OA不太重要的数据库。
+segment 表空间的扩展
+位图这种形式有好和不好，空间占用小，数据库读写，
+位图索引，在频繁查询的表有问题，位图表读的时候加lock,把 表锁释放掉才能进行后续操作
+一个session过来，大并发的环境，位图有关的要有一定的考量
+oracle数据库有完整的机制，做什么都记录到日志
+oracle基础操作：sql ddl dml
+ddl：定义，修改
+dml:增删改查
+create tablespace不记录日志
+force logging，记录到日志
+block :默认8k
+定义的block越大，空间浪费的越厉害，block越小，空间利用越好，管理越复杂。
+参数文件
+free空间管理
+空间扩展
+空闲空间的管理
+block有链表，不会释放空间。只会标记不用了，空间不会释放掉
+编程的时候,linklist修改的指针，也不会回收空间的。
+java垃圾回收只是指堆栈不用的空间的回收
+
+
+freelist
+自动扩展
+default: auto,每次扩64kb
+uniform： 1MB
+
+manual:是通过PCTUSED,REEELISTS
+
+本地管理表空间，
+字典管理表空间，
+
+dbf status：
+oracle数据库：所有的增删改查都在内存里，内存写到数据文件是自动的，满足一定的条件才会写到数据库
+确保数据文件read write,一个程序占用了文件，其他程序不能操作
+其他软件也一样
+对表空间的状态切换，来控制读写
+读写分离：
+备库，dataguad
+主库有一个备库
+备库是只读库：查询用
+读写分离
+通过字节流(stream)的技术同步数据
+不是股票交易中心，断电没事
+生产库down机
+
+MQ消息中间件
+一部分数据库的信息预存在内存里面。
+
+
+缓存就是压队列
+新出来的技术原来就有
+
+openstack,类似em
+应用型技术告诉你就会了，隐藏的不一定知道
+表空间不用的不会释放
+
+表空间修改：扩展，新建
+对预定好的内容进行修改
+
+改大小 
+threadholds:资源限制，多少表空间
+
+GET_DDL
+内建程序
+TB库
+create smallfile tablespace
+bigfile：TB的大容量数据文件
+数据字典表：
+本地管理，字典管理
+字典也是一张表，关于数据库一些信息的表，是系统用户管理的
+动态性能视图表：v$开头，__开头的表，查询的内容数据来源：字典或内存
+
+对象有专有名词，一定有对应的表
+字典表
+动态性能视图表没有复数形式的
+
+v$专有名词
+em鼠标点，程序掉包
+早前的dba：主要做包怎么用
+extent map:区里面数据块的使用
+
+
+inode:
+块有块的信息，区有区的信息
+
+OMF:oracle managed file
+linux操作系统：对权限有管理
+oracle软件对操作系统的某一个文件和文件夹访问权限
+oralce有参数文件，
+show paramter file
+数据库运行的参数文档
+
+desc v$paramter;
+扩展表空间：磁盘没有，把原来的表空间扩大，添加新的数据文件。
+扩表空间，有两种做法。asm
+
+alter user dbsnmp identified by oracle account unlock;
+dbsnmp:snmp协议，监控协议，监控平台，都是snmp协议来监控管理
+linux windows内置snmp协议
+zabbix，nagios(python)，cacti系统监控，对snmp协议解析
+
+oracle监控平台：em
+em:单实例
+unix图表生成工具
+
+
+
+desc dbms_metadata
+
+
+每个用户都有默认的表空间
+[oracle@ocp ~]$ emca -config dbcontrol db -repos recreate 
+
+STARTED EMCA at Mar 16, 2019 1:15:33 PM
+EM Configuration Assistant, Version 11.2.0.3.0 Production
+Copyright (c) 2003, 2011, Oracle.  All rights reserved.
+
+Enter the following information:
+Database SID: 
+---
+WARNING : While repository is dropped the database will be put in quiesce mode.
+----------------------------------------------------------------------
+Do you wish to continue? [yes(Y)/no(N)]: 
+Do you wish to continue? [yes(Y)/no(N)]: y
+Mar 16, 2019 1:29:21 PM oracle.sysman.emcp.EMConfig perform
+INFO: This operation is being logged at /u01/app/oracle/cfgtoollogs/emca/orcl/emca_2019_03_16_13_29_02.log.
+Mar 16, 2019 1:29:22 PM oracle.sysman.emcp.util.DBControlUtil stopOMS
+INFO: Stopping Database Control (this may take a while) ...
+Mar 16, 2019 1:29:24 PM oracle.sysman.emcp.EMReposConfig invoke
+INFO: Dropping the EM repository (this may take a while) ...
+
+https://192.168.43.129:1158/em/
+sysdba
+
+
+grant resource,connect to tester
+
+
+数据默认在默认表空间(系统表空间)
+SYS@orcl>desc dba_data_files;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ FILE_NAME                                          VARCHAR2(513)
+ FILE_ID                                            NUMBER
+ TABLESPACE_NAME                                    VARCHAR2(30)
+ BYTES                                              NUMBER
+ BLOCKS                                             NUMBER
+ STATUS                                             VARCHAR2(9)
+ RELATIVE_FNO                                       NUMBER
+ AUTOEXTENSIBLE                                     VARCHAR2(3)
+ MAXBYTES                                           NUMBER
+ MAXBLOCKS                                          NUMBER
+ INCREMENT_BY                                       NUMBER
+ USER_BYTES                                         NUMBER
+ USER_BLOCKS                                        NUMBER
+ ONLINE_STATUS                                      VARCHAR2(7)
+
+
+
+SYS@orcl>create tablespace test datafile '/u01/app/oracle/oradata/orcl/test.dbf' size 10M
+  2  autoextend on next 1M
+  3  maxsize 300M
+  4  extent management local
+  5  segment space management auto;
+
+Tablespace created.
+
+SYS@orcl>select file_name,tablespace_name from dba_data_files;
+
+
+建索引，临时性的计算数据，是temp，类似linux的swap
+生产中temp表空间利用率是99%-100%
+temp表空间满了不用管,只是计算慢了一点
+为用户建立单独
+create temporary tablespace newtemp tempfile '/u01/app/oracle/oradata/orcl/newtemp.dbf' size 2M;
+
+create tablespace xx datafile '/u01/app/oracle/oradata/orcl/xx.dbf' size 2M;
+PGA
+session过来，就会开辟一块内存
+合理设置PGA,PGA设置的越大，临时表空间用的越少
+
+两个单独的文件变成一组
+数据库很多操作都是从数据库中把注册信息删除
+drop tablespace xx including contents and datafiles;
+
+create temporary tablespace myt1 tempfile '/u01/app/oracle/oradata/orcl/t1.dbf' size 20M tablespace group tt;
+create temporary tablespace myt2 tempfile '/u01/app/oracle/oradata/orcl/t2.dbf' size 20M tablespace group tt;
+alter user tester temporary tablespace tt;
+dba_tablespace_groups
+
+
+2000多张数据字典表
+不同权限
+dba_
+user_
+all_
+
+表空间满了，
+create temporary tablespace xx tempfile 'xx.dbf' size 20M;
+
+[root@ocp ~]# find / -name xx.dbf
+/u01/app/oracle/product/11.2.0/dbhome_1/dbs/xx.dbf
+表空间
+blocksize：默认数据块大小
+SYS@orcl>show parameter size;
+
+NAME                                 TYPE        VALUE
+------------------------------------ ----------- ------------------------------
+bitmap_merge_area_size               integer     1048576
+client_result_cache_size             big integer 0
+
+内存块大小和block size大小对应
+表空间有压缩等级
+百度云盘：去重功能，用的压缩，存的软连接
+加密的表空间
+flashback
+alter tablespace 
+alter database datafile 
+desc dba_data_files;
+FILE_ID
+
+SELECT FILE_NAME,FILE_ID,TABLESPACE_NAME,BYTES/1024/2014  M from dba_data_files;
+alter database datafile '/u01/app/oracle/oradata/orcl/cuihh.dbf' resize 15m
+CREATE Tablespace cuihh datafile '/u01/app/oracle/oradata/orcl/cuihh.dbf' size 5M;  
+
+
+
+
+SYS@orcl>CREATE Tablespace cuihh datafile '/u01/app/oracle/oradata/orcl/cuihh.dbf' size 5M; 
+
+Tablespace created.
+
+SYS@orcl>SELECT FILE_NAME,FILE_ID,TABLESPACE_NAME,BYTES/1024/2014  M from dba_data_files;
+
+FILE_NAME
+--------------------------------------------------------------------------------
+   FILE_ID TABLESPACE_NAME                         M
+---------- ------------------------------ ----------
+/u01/app/oracle/oradata/orcl/users01.dbf
+         4 USERS                          2.54220457
+
+/u01/app/oracle/oradata/orcl/undotbs01.dbf
+         3 UNDOTBS1                        149.99007
+
+/u01/app/oracle/oradata/orcl/sysaux01.dbf
+         2 SYSAUX                          294.89573
+
+
+FILE_NAME
+--------------------------------------------------------------------------------
+   FILE_ID TABLESPACE_NAME                         M
+---------- ------------------------------ ----------
+/u01/app/oracle/oradata/orcl/system01.dbf
+         1 SYSTEM                         366.077458
+
+/u01/app/oracle/oradata/orcl/example01.dbf
+         5 EXAMPLE                        175.729891
+
+/u01/app/oracle/oradata/orcl/test.dbf
+         6 TEST                            7.6266137
+
+
+FILE_NAME
+--------------------------------------------------------------------------------
+   FILE_ID TABLESPACE_NAME                         M
+---------- ------------------------------ ----------
+/u01/app/oracle/oradata/orcl/cuihh.dbf
+         7 CUIHH                          2.54220457
+
+
+7 rows selected.
+
+SYS@orcl>alter database datafile '/u01/app/oracle/oradata/orcl/cuihh.dbf' resize 10m    
+  2  ;
+
+Database altered.
+
+SYS@orcl>SELECT FILE_NAME,FILE_ID,TABLESPACE_NAME,BYTES/1024/2014  M from dba_data_files;
+
+FILE_NAME
+--------------------------------------------------------------------------------
+   FILE_ID TABLESPACE_NAME                         M
+---------- ------------------------------ ----------
+/u01/app/oracle/oradata/orcl/users01.dbf
+         4 USERS                          2.54220457
+
+/u01/app/oracle/oradata/orcl/undotbs01.dbf
+         3 UNDOTBS1                        149.99007
+
+/u01/app/oracle/oradata/orcl/sysaux01.dbf
+         2 SYSAUX                          294.89573
+
+
+FILE_NAME
+--------------------------------------------------------------------------------
+   FILE_ID TABLESPACE_NAME                         M
+---------- ------------------------------ ----------
+/u01/app/oracle/oradata/orcl/system01.dbf
+         1 SYSTEM                         366.077458
+
+/u01/app/oracle/oradata/orcl/example01.dbf
+         5 EXAMPLE                        175.729891
+
+/u01/app/oracle/oradata/orcl/test.dbf
+         6 TEST                            7.6266137
+
+
+FILE_NAME
+--------------------------------------------------------------------------------
+   FILE_ID TABLESPACE_NAME                         M
+---------- ------------------------------ ----------
+/u01/app/oracle/oradata/orcl/cuihh.dbf
+         7 CUIHH                          5.08440914
+
+
+7 rows selected.
+
+SYS@orcl>
+
+
+
+
+SYS@orcl>create table tb(name date) tablespace cuihh;
+
+Table created.
+
+SYS@orcl>alter tablespace cuihh read only
+  2  /
+
+Tablespace altered.
+
+
+SYS@orcl>select tablespace_name,status from dba_tablespaces;
+
+TABLESPACE_NAME                STATUS
+------------------------------ ---------
+SYSTEM                         ONLINE
+SYSAUX                         ONLINE
+UNDOTBS1                       ONLINE
+TEMP                           ONLINE
+USERS                          ONLINE
+EXAMPLE                        ONLINE
+TEST                           ONLINE
+MYT1                           ONLINE
+MYT2                           ONLINE
+XX                             ONLINE
+CUIHH                          READ ONLY
+
+
+alter tablespace cuihh read write;
+
+
+SYS@orcl>select tablespace_name,status from dba_tablespaces;
+
+TABLESPACE_NAME                STATUS
+------------------------------ ---------
+SYSTEM                         ONLINE
+SYSAUX                         ONLINE
+UNDOTBS1                       ONLINE
+TEMP                           ONLINE
+USERS                          ONLINE
+EXAMPLE                        ONLINE
+TEST                           ONLINE
+MYT1                           ONLINE
+MYT2                           ONLINE
+XX                             ONLINE
+CUIHH                          ONLINE
+
+11 rows selected.
+
+1.create tablespace 
+2.tablespace offline
+3.tablespace online
+4.control file
+时间戳：日志，控制文件，数据文件，三者要一致，三者不一致，数据库认为发生了灾难
+一个表空间多个数据文件，alter offline，所有数据文件都offile
+分区表，一张表分成好几张表，好几张表放一张表空间。
+分库分表
+是数据库的一部分表空间不可用，其他表空间可用
+脱机表空间备份，冷备份
+在线备份
+scn:时间戳
+默认offline是normal
+shutdown  immediate/force
+
+SELECT FILE_NAME,FILE_ID,TABLESPACE_NAME,BYTES/1024/2014  M from dba_data_files;
+alter tablespace cuihh offline
+/u01/app/oracle/oradata/orcl/cuihh.dbf
+
+alter tablespace mytbs8 rename datafile '/u01/app/oracle/oradata/mytbs8.dbf' to '/u01/app/oracle/oradata/mytbs.dbf';
+
+
+一个表空间可以对应多个数据文件
+SYS@orcl>desc v$datafile;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ FILE#                                              NUMBER
+ CREATION_CHANGE#                                   NUMBER
+ CREATION_TIME                                      DATE
+ TS#                                                NUMBER
+ RFILE#                                             NUMBER
+ STATUS                                             VARCHAR2(7)
+ ENABLED                                            VARCHAR2(10)
+ CHECKPOINT_CHANGE#                                 NUMBER
+ CHECKPOINT_TIME                                    DATE
+ UNRECOVERABLE_CHANGE#                              NUMBER
+ UNRECOVERABLE_TIME                                 DATE
+ LAST_CHANGE#                                       NUMBER
+ LAST_TIME                                          DATE
+ OFFLINE_CHANGE#                                    NUMBER
+ ONLINE_CHANGE#                                     NUMBER
+ ONLINE_TIME                                        DATE
+ BYTES                                              NUMBER
+ BLOCKS                                             NUMBER
+ CREATE_BYTES                                       NUMBER
+ BLOCK_SIZE                                         NUMBER
+ NAME                                               VARCHAR2(513)
+ PLUGGED_IN                                         NUMBER
+ BLOCK1_OFFSET                                      NUMBER
+ AUX_NAME                                           VARCHAR2(513)
+ FIRST_NONLOGGED_SCN                                NUMBER
+ FIRST_NONLOGGED_TIME                               DATE
+ FOREIGN_DBID                                       NUMBER
+ FOREIGN_CREATION_CHANGE#                           NUMBER
+ FOREIGN_CREATION_TIME                              DATE
+ PLUGGED_READONLY                                   VARCHAR2(3)
+ PLUGIN_CHANGE#                                     NUMBER
+ PLUGIN_RESETLOGS_CHANGE#                           NUMBER
+ PLUGIN_RESETLOGS_TIME                              DATE
+
+SYS@orcl>
+
+CHECKPOINT_CHANGE#                                 
+ CHECKPOINT_TIME                                    
+ UNRECOVERABLE_CHANGE#                              
+ UNRECOVERABLE_TIME                                 
+ LAST_CHANGE#                                       
+ LAST_TIME      
+每个时间戳有两个记录
+记录在数据文件头部信息，日志文件，控制文件
+
+不考大表空间
+8EB
+EB,大公司有
+银河有用到
+
+有专有服务器可以查数据
+
+单个文件大小有讲究
+FAT:不能大于4gb，大于4gb不能拷贝
+和文件系统有关
+一个文件可以达到8EB
+
+
+脱机表空间不可以drop
+段：表
+还有，索引等其他对象，procedure都在表空间，都占用段空间
+
+表的段：
+
+分区表：
+簇表：和索引有关
+相同类型的数据放在一起
+
+索引段
+指定表空间放索引
+索引组织表
+索引是一张表，和数据不在一张表
+索引是表，表就是索引，不分开放
+lob段：二进制，声音，图片，照片
+excel表，
+pctfree pctused
+
+
+! cp 是调用系统命令
