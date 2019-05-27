@@ -1,0 +1,469 @@
+dba，做备份，
+shell脚本
+自动化运维平台都是脚本写好，调用脚本
+学习shell脚本
+
+软件的安装
+dbca数据库(图形化)
+
+脚本安装数据库
+
+netca(数据库连不通，看监听在不在)
+
+工作中快速解决监听问题
+linux中所有东西都是配置文件的
+
+
+监听
+nis(网络服务监听)
+
+shared server
+dedicated server
+
+
+发起连接，建立session会话
+dedicated server,每一个连接，建立一个一个session ,session占用区域PGA，内存不够用
+shared server，把PGA共享出来，mqueue,压队列，
+
+三层结构，中间件解决，session池，大的压力给你应用服务器
+
+
+监听：是一个独立的程序(监听是一个小耳朵)
+
+TCP/IP协议
+网络ISO模型
+标准化的应用框架，设计图，根据这个图划分，不同的结构由不同的厂商提供
+软件厂商，硬件厂商，和这个基础网络模型有关
+ISO是软件层
+应用层-传输层-网络层-数据链路层-物理层
+把网络分了，路由器，电缆，硬件，通讯网络公司(电讯商)
+TCP/IP协议
+802.3 802.2HDLC WIFI
+摩尔斯密码对照表就是一个协议
+按照一定的协议格式
+
+每个层面通讯都是按照指定的格式
+
+数据包的封装和转发
+一组电信号称为帧
+物理地址是16位16进制
+通讯时先传一个mac地址
+提供路由器，进行路由寻址
+软件调用底层API接口
+
+
+
+切片和封装，数据一帧一帧发
+应用层：软件的东西，服务器上的所启动的服务，不同的端口传输的数据内容和格式是不同的
+DNS DYNAMIC NAME SERVER
+SNMP:简单网络管理软件，发送，内存，cpu，硬件运行状态
+
+NFS：linux文件服务共享
+FTP:
+传输数据包的格式内容不同
+
+
+ORACLE监听：1521
+
+应用层的代码，和数据库实例没有关系，单独的程序
+
+三次握手
+ACk：请求
+seq:应答
+在正式发送数据后，进行三次通讯，确认没问题再传数据
+
+配置内容是括号套括号
+(xxx(yyy))
+套接字
+unix网络编程，soket编程
+
+通讯建立在应用会话层的，属于TCP/IP协议
+监听是独立程序和数据库没关系，没有监听，数据库照样登录
+oracle client和监听配对：监听默认端口是1521，请求端口，
+发送端口是随机的。
+selinux关闭，就是因为数据库返回数据是随机端口。有自己的算法
+
+tnsnames(dns) ip和数据库对应
+listener.ora：
+sqlnet.ora:和Oracle网络通讯安全有关。启安全有关的服务，需要配置sqlnet
+
+
+tnsnames.ora:我要去连
+listener.ora:我要接收
+
+11g em:单实例库
+12c oms
+18c cloud manage
+
+
+tnsnames:host port protocol 实例名
+库：数据库软件+数据文件
+实例：数据库软件在内存中跑的东西，实例是一块内存区域
+一个实例可以有多个服务名称，针对不同的人，不同的资源限制
+schema：用户所属的数据库的数据文件(数据文件和数据库对象)，和用户有关的所有数据库对象的集合统称
+
+
+
+SYS@orcl>startup
+ORACLE instance started.
+
+Total System Global Area 1707446272 bytes
+Fixed Size                  1345408 bytes
+Variable Size            1006635136 bytes
+Database Buffers          687865856 bytes
+Redo Buffers               11599872 bytes
+
+------------以上的内存都属于实例
+Database mounted.
+Database opened.
+
+
+oracle实例名称
+
+[oracle@ocp samples]$ echo $ORACLE_SID 
+orcl
+
+实例名称是内存里面
+
+ps -ef|grep ora
+
+
+11g可以多实例
+在启动一个实例，就拷贝一份
+
+程序在跑，在用内存，监听占用的内存叫PGA
+数据压队列，排序
+SGA:实例内存
+
+动态监听和静态监听
+
+
+lsnrctl status listener
+
+netmgr
+
+
+
+LISTENER =
+  (DESCRIPTION_LIST =
+    (DESCRIPTION =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = ocp)(PORT = 1521))--监听机器端口，hosts尽量写名称不要写ip,grid切换快,通用性高
+      (ADDRESS = (PROTOCOL = IPC)(KEY = EXTPROC1521))--进程通讯 和oracle实例通讯
+    )
+  )
+协议套接，相当于函数
+sqlplus / as sysdba
+sqlplus sys/12345 as sysdba,
+关闭监听，用的是操作系统权限登录
+lsnrctl start(no service)
+alter system register;
+
+
+sqlplus sys/12345@192.168.96.128:1521/orcl as sysdba
+
+[oracle@ocp ~]$ sqlplus sys/12345@test  as sysdba
+
+SQL*Plus: Release 11.2.0.3.0 Production on Sat Mar 9 11:23:28 2019
+
+Copyright (c) 1982, 2011, Oracle.  All rights reserved.
+
+
+Connected to:
+Oracle Database 11g Enterprise Edition Release 11.2.0.3.0 - Production
+With the Partitioning, OLAP, Data Mining and Real Application Testing options
+
+SYS@test>   
+
+
+LDAP linux(考试不考)
+
+
+数据库切换用户就是conn 
+alter user hr identified by hr account unlock;
+
+
+mac ==> ipv4地址
+
+ip地址：
+11111111  11111111 11111111  111111111
+255.255.255.255
+前三位代表网络
+IP地址算法
+
+特殊地址保留
+127.0.0.1 本机 loop
+
+
+不同的区域做不同的工作(压队列和排序)
+PGA 
+share pool
+
+
+ip address
+ifconfig
+
+[root@ocp ~]# netstat -ntlp
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address               Foreign Address             State       PID/Program name   
+tcp        0      0 127.0.0.1:2208              0.0.0.0:*                   LISTEN      3883/hpiod          
+tcp        0      0 0.0.0.0:897                 0.0.0.0:*                   LISTEN      3683/rpc.statd      
+tcp        0      0 0.0.0.0:111                 0.0.0.0:*                   LISTEN      3648/portmap        
+tcp        0      0 127.0.0.1:631               0.0.0.0:*                   LISTEN      3910/cupsd          
+tcp        0      0 127.0.0.1:25                0.0.0.0:*                   LISTEN      4035/sendmail: acce 
+tcp        0      0 127.0.0.1:2207              0.0.0.0:*                   LISTEN      3888/python         
+tcp        0      0 :::47906                    :::*                        LISTEN      30240/ora_d000_orcl 
+tcp        0      0 :::1521                     :::*                        LISTEN      30806/tnslsnr       
+tcp        0      0 :::22                       :::*                        LISTEN      3901/sshd     
+
+
+[root@ocp ~]# lsof -i:1521
+COMMAND   PID   USER   FD   TYPE DEVICE SIZE NODE NAME
+oracle  30208 oracle   16u  IPv4  53763       TCP ocp:28072->ocp:ncube-lm (ESTABLISHED)
+tnslsnr 30806 oracle    8u  IPv6  53534       TCP *:ncube-lm (LISTEN)
+tnslsnr 30806 oracle   13u  IPv6  53764       TCP ocp:ncube-lm->ocp:28072 (ESTABLISHED)
+[root@ocp ~]# 
+
+
+内部通讯
+
+
+tnsping可用
+[oracle@ocp admin]$ tnsping test
+
+TNS Ping Utility for Linux: Version 11.2.0.3.0 - Production on 09-MAR-2019 13:15:52
+
+Copyright (c) 1997, 2011, Oracle.  All rights reserved.
+
+Used parameter files:
+
+
+Used TNSNAMES adapter to resolve the alias
+Attempting to contact (DESCRIPTION = (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = ocp)(PORT = 1521))) (CONNECT_DATA = (SERVICE_NAME = orcl)))
+OK (0 msec)
+
+Dispatcher:队列管理器，设置一个或N个
+设置shared server
+
+
+SYS@orcl>show parameter listener;
+
+NAME                                 TYPE        VALUE
+------------------------------------ ----------- ------------------------------
+listener_networks                    string
+local_listener                       string
+remote_listener                      string
+SYS@orcl>show paramter dispatch
+SP2-0158: unknown SHOW option "paramter"
+SP2-0158: unknown SHOW option "dispatch"
+SYS@orcl>show parameter dispatch
+
+NAME                                 TYPE        VALUE
+------------------------------------ ----------- ------------------------------
+dispatchers                          string      (PROTOCOL=TCP) (SERVICE=orclXD
+                                                 B)
+max_dispatchers                      integer
+SYS@orcl>
+
+
+生产中不用shared server
+share server多了一个进程，多了一个进程的内存，这个进程就是session pool
+
+压力都在应用服务器上处理
+长链接
+
+三层结构
+应用服务器，数据库，存储
+
+SGA:实例活着的地方
+低内存是堆
+高地址是栈
+
+shared pool处理sql，和数据
+
+PGA:用户输入的SQL
+返回的数据
+
+
+d开头的进程就是dispatcher
+tns改成shared server
+alter system set dispatchers='(PROTOCOL=TCP)(DISPATCHERS=3)';
+
+改成私有server
+alter system set dispatchers='(PROTOCOL=TCP)(SERVICE=orclXD)';
+
+
+
+startup force
+
+
+session池可分配连接最大值255个
+资源管理
+一个连接维持多久
+cpu,memory,配额限制
+
+data warehouse operations 跑报表，跑批监控
+执行脚本(
+大量sql计算语句
+大型报表
+)
+网银有网银的数据库
+借记卡有借记卡的数据库
+一张报表生成要4个小时
+银行最忙的是关了门之后
+select存储过程
+
+
+
+报表软件：isoft
+
+bi publisher
+
+dblink
+using '连接字符串'
+tnsnames.name里面配置的字符串
+select * from sh.sales@dblink1
+
+create synonym sales for sh.sales@dblink1
+
+select * from sales;
+
+
+建完dblink再建同义词
+
+
+dblink是数据库里面sqlplus tnsname连接了
+
+
+
+动态监听
+静态监听
+
+监听程序运行方式有两种：动态监听，静态监听
+
+默认是动态监听，学完后改成静态监听，一些高级服务依赖静态监听
+
+监听程序怎么知道数据库安装在哪里，是否存在，是数据库找监听还是监听找数据库
+
+谁去找谁决定了监听的工作方式
+
+监听程序去找数据库：静态监听，必须配置告诉监听数据库软件在哪里运行
+
+数据库找监听：动态监听
+
+默认安装完，是动态监听。
+
+
+alter system register,把数据库的信息注册到监听里，叫动态监听
+
+
+
+静态监听配置：
+
+
+
+
+
+show parameter name
+
+add database
+orcl
+orcl
+
+数据库告诉监听：我准备好了  动态监听
+
+
+[oracle@ocp admin]$ lsnrctl reload listener
+
+LSNRCTL for Linux: Version 11.2.0.3.0 - Production on 09-MAR-2019 14:19:53
+
+Copyright (c) 1991, 2011, Oracle.  All rights reserved.
+
+Connecting to (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=ocp)(PORT=1521)))
+The command completed successfully
+
+
+Service "orcl" has 2 instance(s).
+  Instance "orcl", status UNKNOWN, has 1 handler(s) for this service...
+
+监听去找数据库：静态监听
+
+
+都是独立的程序，
+
+DG rman最好是静态监听
+
+数据库down掉，动态监听连不进去，静态可以连进去
+
+
+改端口
+
+alter system set local_listener='(ADDRESS=(PROTOCOL=TCP)(HOST=ocp)(PORT=1522))'
+修改listener.ora,tnsname.ora端口都改
+
+
+多个监听的时候可以控制启动哪个监听
+不加监听启动默认的监听。程序加载完会读后面的监听
+
+考点
+专有服务器，shared服务器
+改端口
+监听配置文件
+sqlnet关于安全的
+网络原理
+
+shared服务器,压队列。内存就那点
+专有服务器是一个session开辟一块区域
+
+SYS@test>show parameter os 
+
+NAME                                 TYPE        VALUE
+------------------------------------ ----------- ------------------------------
+db_lost_write_protect                string      NONE
+diagnostic_dest                      string      /u01/app/oracle
+optimizer_index_cost_adj             integer     100
+os_authent_prefix                    string      ops$
+os_roles                             boolean     FALSE
+remote_os_authent                    boolean     FALSE
+remote_os_roles                      boolean     FALSE
+timed_os_statistics                  integer     0
+
+
+SYS@test>col name for a30; 
+SYS@test>col value for a20;
+
+
+SYS@test>help set
+
+ SET
+ ---
+
+ Sets a system variable to alter the SQL*Plus environment settings
+ for your current session. For example, to:
+     -   set the display width for data
+     -   customize HTML formatting
+     -   enable or disable printing of column headings
+     -   set the number of lines per page
+	 
+
+SYS@test>set pagesize 200;
+SYS@test>set line 300;
+
+PL/SQL Developer
+
+
+
+toad
+
+把端口改回默认的
+SYS@test>alter system set  local_listener='';
+
+System altered.
+
+SYS@test>alter system reset local_listener
+  2  /
+
+System altered.
+
+修改tnsname.ora,listener.ora里面的端口
+
+select * from dba_objects
