@@ -1,0 +1,255 @@
+DDL
+DML
+insert into tbname 
+values()
+
+
+处理空值的函数
+插入日期一定要转换
+NLS_DATE_FORMAT
+
+
+日期是特殊的数字
+
+
+insert into test(&id,sysdate);
+&id定义变量，等待输入
+insert into tbname select * from tbname2
+
+
+表锁
+
+
+
+事务四个特性：ACID
+
+压缩表就是去重
+
+
+堆表(普通表)
+IOT表
+外表
+
+_开头的表是全局的，隐藏表
+
+
+default不过滤空''，加not null可以过滤空''
+
+default和空值的关系
+
+
+数据类型
+
+
+rowid：数据所在块的物理地址的编号
+也是数据类型
+
+
+三种时间类型：
+SCN
+timestamp
+sysdate
+三者可以相互转换
+
+Oracle 是java c写的
+只要java c支持的Oracle都支持
+
+
+约束：过滤垃圾数据，建立表之间的关系
+
+主外键，delete cascade
+
+
+不要往数据删除数据或者修改数据，减少不必要的麻烦
+
+
+
+snapshot
+
+视图分类：
+简单视图，复杂视图，物化视图，动态性能视图
+
+
+
+
+复杂试图：多表查询，查询里面有函数
+
+
+
+Oracle三个伪列：rowid，rownum，level
+
+
+with check option
+
+
+sequences:编号
+跟着会话跑，会话断了，sequence就没了。
+
+create sequence
+
+
+sequence要跑起来才能用
+创建完不能用
+
+select seq.nectval from dual;
+
+
+
+sequnce是session级别的
+
+
+换个会话，查询seq.currval返回不存在,需要nextval一下
+再切回原来的会话，seq就会
+
+
+
+
+rollback,系统崩了
+
+index也是一种表，表的构成内容不一样
+
+index存储方式(二叉树)
+index类型(bitmap)
+
+加快找到数据，检索的数据在占表总数据量的中占2%-4%，这个索引是有效的
+
+
+表数据分类多(不只男女)
+
+索引是一张表，索引不存在null值，把null值过滤了。包含null的值记录不建索引
+
+where解析sql的时候，会先找对应这个列是否建了索引。
+
+建了索引，系统会用，系统会做判断。有这机制
+
+
+desc dba_indexes
+
+
+
+同义词
+
+select * from hr.tbname
+
+
+持久存储在oracle数据库里
+
+
+
+
+
+create public synonym emp for hr.employees;
+select * from emp;
+
+
+create public synonym emp for hr.employees;
+
+synonym看基表权限
+
+
+
+只要是数据库的对象，都可以建立一个synonym
+
+数据字典：关于数据的数据
+
+
+数据字典：有基表和视图
+
+
+dba_开头
+user_开头
+
+
+all_user sys用户
+v$ 动态性能视图表
+
+
+desc dict;
+
+所有字典表的说明都在dict表里
+
+
+
+select count(table_name) from dict;
+
+
+
+
+
+
+select table_name from dict where table_name like 'V$*';
+
+在复杂的sql找from
+
+DEFAULT
+
+
+INSERT INTO TBNAME VALUES(A,B,DEFAULT);
+
+
+
+INSERT ALL INTO 
+
+分库分表
+
+
+INSERT ALL
+	INTO TB_A VALUES()
+	INTO TB_B VALUES()
+	INTO TB_C VALUES()
+SELECT * FROM TB_D WHERE..
+
+
+
+
+
+
+
+
+CASE WHEN THEN
+
+
+
+
+
+
+
+
+insert all:插入全部表才返回OK
+
+insert first：只要插入一张表成功就返回ok
+
+
+
+条件插入
+insert first/all 
+when
+else
+
+
+
+
+
+
+
+
+
+行列转换
+行转列
+
+
+列转行
+
+
+
+merge into table
+
+把多表的数据汇总到一个表
+
+
+追踪scn
+记录变动以scn为基准
+
+
+
+
