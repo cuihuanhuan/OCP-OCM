@@ -1,0 +1,215 @@
+catelog
+远程管理，远程复制
+catelog是数据库，连不同的实例
+rman备份信息都存储在catelog数据库中
+catelog只存储备份信息，不存储备份文件
+备份的数据文件不存放在catelog数据库里面的
+catelog数据库
+在普通的数据库上
+recovery_catelog_owner
+
+登录catalog
+create catalog,
+create virtual catalog database;
+list incarnation;
+
+远程数据库通过catalog连接，需要注册，
+virtual catalog需要赋权
+
+
+虚机选已复制，会把一些参数清除
+
+
+vim /etc/sudoer
+
+
+create tablespace rc_tbs datafile '/u01/app/oracle/oradata/orcl/orclpdb/rc_tbs.dbf' size 50M autoextend on extent management local;
+create user c###rc_admin identified by 12345 default tablespace rc_tbs;
+grant connect,dba,resource,recovery_catalog_owner to c###rc_admin;
+
+
+
+
+
+
+
+cat /etc/hosts
+
+echo 'IP NAME'  >>
+
+rm -rf *.swp
+
+
+su - oracle
+startup open
+
+
+select file_name from dba_data_files;
+
+
+netmgr
+
+
+[oracle@12c ~]$ rman catalog rc_admin/12345@orclpdb
+RMAN> create catalog;
+
+
+
+通过rman连接数据库
+
+[oracle@12c ~]$ rman target system/12345 catalog rc_admin/12345@orclpdb
+
+upgrade执行两遍
+
+register database;注册数据库
+
+list incarnation;
+
+
+
+rman target \'sys/12345@orclpdb as sysdba\'
+
+
+
+
+tns，oracle的域名解析
+
+已经注册的数据库内容的查询
+select * from rc_database
+
+
+
+
+
+
+
+rman catalog rc_admin/12345@orclpdb
+RMAN> create catalog;
+rman target system/12345 catalog rc_admin/12345@orclpdb
+RMAN> upgrade catalog;
+RMAN> upgrade catalog;
+RMAN> register database;
+RMAN> list incarnation;
+drop catalog;
+drop catalog;
+create catalog;
+
+
+rman target system/12345@ORCLPDB_REMOTE catalog rc_admin/12345@orclpdb
+
+
+rman catalog rc_admin/12345@ORCLPDB_REMOTE catalog rc_admin/12345@orclpdb;
+
+
+
+select * from rc_database;
+
+
+[oracle@12c_2 ~]$ rman target system/12345@orclpdb_remote catalog rc_admin/12345@orclpdb
+
+Recovery Manager: Release 12.2.0.1.0 - Production on Sat May 25 18:56:44 2019
+
+Copyright (c) 1982, 2017, Oracle and/or its affiliates.  All rights reserved.
+
+RMAN-00571: ===========================================================
+RMAN-00569: =============== ERROR MESSAGE STACK FOLLOWS ===============
+RMAN-00571: ===========================================================
+RMAN-00554: initialization of internal recovery manager package failed
+RMAN-04005: error from target database: 
+ORA-01017: invalid username/password; logon denied
+
+
+catalog库
+
+指定某个用户有自己的catalog
+这个catalog是组分发出去的
+
+
+
+
+
+
+
+https://blog.csdn.net/leshami/article/details/6043649
+
+
+
+
+
+
+SQL> create tablespace vptb01 datafile '/u01/app/oracle/oradata/orcl/orclpdb/vptb01.dbf' size 50M autoextend on extent management local;
+
+Tablespace created.
+
+SQL> create user vps_user identified by 12345 default tablespace vptb01;
+
+User created.
+
+SQL> grant recovery_catalog_owner to vps_user;
+
+Grant succeeded.
+
+SQL> exit
+
+
+
+
+
+
+
+
+
+[oracle@12c_2 ~]$ rman catalog rc_admin/12345@orclpdb;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+rman catalog rc_admin/12345@orclpdb;
+
+grant register database to vps_user;
+
+
+grant catalog for database prod1 to vps_user;
+
+
+
+
+
+
+
+rman target system/12345@orclpdb catalog rc_admin/12345@orclpdb
+
+list backups
+crosscheck bacup;
+delete expired backup
+
+
+show
+
+
+
+
+不完整恢复set uitl scn
+数据泵
+
+
+adr工具
+
+大多数问题可以修
+
+首先做了备份，然后
+
+list failure;
+advise failure;
+repaire failure;
