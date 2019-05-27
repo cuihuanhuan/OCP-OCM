@@ -1,0 +1,67 @@
+asm：文件系统在oracle中处理，比操作系统-文件系统转为oracle更快
+存储LUN
+画一个片把一个lun加载进去。
+ASM实例,内存，
+ASM对应的内存
+共享池：源信息，表头信息
+
+vm
+网卡
+主机名(/etc/sysconfig/network)
+hosts文件
+
+mount
+vim /etc/yum.repos.d/local.repo
+
+[local]
+name=local
+baseurl=file:///mnt/cdrom/Server
+gpgcheck=0
+enable=1
+
+
+n
+p
+1
+w
+
+udev固定盘符
+asmlib
+oracle，linux自带asm包
+
+[root@ocp ~]# service oracleasm createdisk VOL1 /dev/sdb1
+Marking disk "VOL1" as an ASM disk:                        [FAILED]
+[root@ocp ~]# vim /var/log/oracleasm
+[root@ocp ~]# oracleasm deletedisk VOL1
+Clearing disk header: done
+
+[root@ocp ~]# service oracleasm createdisk VOL1 /dev/sdb1
+Marking disk "VOL1" as an ASM disk:                        [  OK  ]
+
+[root@ocp ~]# service oracleasm createdisk VOL2 /dev/sdc1
+Marking disk "VOL2" as an ASM disk:                        [  OK  ]
+[root@ocp ~]# service oracleasm createdisk VOL3 /dev/sdd1
+Marking disk "VOL3" as an ASM disk:                        [  OK  ]
+[root@ocp ~]# service oracleasm createdisk VOL4 /dev/sde1
+Marking disk "VOL4" as an ASM disk:                        [  OK  ]
+[root@ocp ~]# service oracleasm createdisk VOL5 /dev/sdf1
+Marking disk "VOL5" as an ASM disk:                        [  OK  ]
+[root@ocp ~]# service oracleasm createdisk VOL6 /dev/sdg1
+Marking disk "VOL6" as an ASM disk:                        [  OK  ]
+
+
+[root@ocp ~]# service oracleasm listdisks
+VOL1
+VOL2
+VOL3
+VOL4
+VOL5
+VOL6
+
+resolv.conf dns解析
+
+图形化，sql都可以将磁盘加到磁盘组
+
+先装grid再装oracle
+
+http://blog.itpub.net/28194062/viewspace-1684426/
