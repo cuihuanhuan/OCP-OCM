@@ -1,0 +1,874 @@
+分区表要在在每个分区上建索引
+vm内置一个虚拟交换机
+桥接：将TCP/IP协议进行转发，不进行封装
+NAT:将TCP/IP进行封装
+仅主机：虚拟机不可以访问外网，仅局域网通信
+文件夹给20G，用完就没办法扩展，有lvm技术
+加载到资源池PV,文件夹映射到池子里，形成可动态的扩展
+oracle一定安装动态逻辑卷和可扩展分区中
+swap:内存交换，oracle需要，需要修改tmp.fs
+操作系统是一组软件的集合
+vm tools:调分辨率,和windows底层通信的软件
+oracle没有防火墙
+开监听，1521只是监听，只是接收的端口，返回数据出去是随机端口
+cs结构
+selinux：进程间通信的权限管理
+tar -cvf：压缩包
+tar -xvf：解压
+rm -rf *删除整个磁盘
+重启linux：init 6
+ifconfig interface config简写
+虚拟网络编辑器
+ ip address
+ ip -a
+ ifconfig
+ /etc/sysconfig/network-scripts
+vim三种模式：
+编辑模式i a 
+命令模式shift+:    set nu
+
+子网掩码看机器是在一个子网里
+wq顺序不要错
+[root@localhost network-scripts]# mount
+/dev/mapper/VolGroup00-LogVol00 on / type ext3 (rw)
+proc on /proc type proc (rw)
+sysfs on /sys type sysfs (rw)
+devpts on /dev/pts type devpts (rw,gid=5,mode=620)
+/dev/sda1 on /boot type ext3 (rw)
+tmpfs on /dev/shm type tmpfs (rw)
+none on /proc/sys/fs/binfmt_misc type binfmt_misc (rw)
+none on /proc/fs/vmblock/mountPoint type vmblock (rw)
+sunrpc on /var/lib/nfs/rpc_pipefs type rpc_pipefs (rw)
+/dev/scd0 on /media/Enterprise Linux dvd 20090908 type iso9660 (ro,noexec,nosuid,nodev,uid=0)
+
+[root@localhost network-scripts]# mkdir -p /mnt/cdrom
+[root@localhost network-scripts]# mount /dev/scd0 /mnt/cdrom/
+mount: block device /dev/scd0 is write-protected, mounting read-only
+
+[root@localhost network-scripts]# mount
+/dev/mapper/VolGroup00-LogVol00 on / type ext3 (rw)
+proc on /proc type proc (rw)
+sysfs on /sys type sysfs (rw)
+devpts on /dev/pts type devpts (rw,gid=5,mode=620)
+/dev/sda1 on /boot type ext3 (rw)
+tmpfs on /dev/shm type tmpfs (rw)
+none on /proc/sys/fs/binfmt_misc type binfmt_misc (rw)
+none on /proc/fs/vmblock/mountPoint type vmblock (rw)
+sunrpc on /var/lib/nfs/rpc_pipefs type rpc_pipefs (rw)
+/dev/scd0 on /media/Enterprise Linux dvd 20090908 type iso9660 (ro,noexec,nosuid,nodev,uid=0)
+/dev/scd0 on /mnt/cdrom type iso9660 (ro)
+
+
+[root@localhost network-scripts]# vim /etc/yum.repos.d/local.repo
+
+[root@localhost network-scripts]# yum update
+Loaded plugins: security
+local                                                    | 1.1 kB     00:00     
+local/primary                                            | 795 kB     00:00     
+local                                                                 2278/2278
+Skipping security plugin, no data
+Setting up Update Process
+No Packages marked for Update
+[root@localhost network-scripts]# cat /etc/yum.repos.d/local.repo 
+[local]
+name=local
+baseurl=file:///mnt/cdrom/Server
+gpdcheck=0
+enable=1
+[root@localhost network-scripts]# 
+
+[root@localhost network-scripts]# hostname
+localhost.localdomain
+
+
+[root@localhost network-scripts]# vim /etc/sysconfig/network
+[root@localhost network-scripts]# cat /etc/sysconfig/network
+NETWORKING=yes
+NETWORKING_IPV6=no
+HOSTNAME=ocp
+[root@localhost network-scripts]# 
+命令修改主机名只是临时的，重启就消失了
+yum类似iphone 的app store
+
+4.grid
+5.gc
+6.
+7.example 
+
+
+linux做镜像文件mkisofs
+
+
+[root@ocp tmp]# cat yum.sh 
+!#/bin/bash
+
+yum install binutils* -y
+yum install compat* -y
+yum install elfutils* -y
+yum install gcc* -y
+yum install glibc* -y
+yum install kernel* -y
+yum install ksh* -y
+yum install libaio* -y
+yum install libgcc* -y
+yum install libgomp* -y
+yum install libstdc* -y
+yum install make* -y
+yum install sysstat* -y
+yum install unixODBC* -y
+yum install libcap* -y
+yum install -y compat-libcap1*
+yum install -y compat-libstdc*
+
+
+
+
+[root@ocp ~]# yum install binutils* -y
+Loaded plugins: security
+local                                                    | 1.1 kB     00:00     
+Setting up Install Process
+Package binutils-2.17.50.0.6-12.el5.i386 already installed and latest version
+Resolving Dependencies
+--> Running transaction check
+---> Package binutils-devel.i386 0:2.17.50.0.6-12.el5 set to be updated
+--> Finished Dependency Resolution
+
+Dependencies Resolved
+
+================================================================================
+ Package               Arch        Version                   Repository    Size
+================================================================================
+Installing:
+ binutils-devel        i386        2.17.50.0.6-12.el5        local        705 k
+
+Transaction Summary
+================================================================================
+Install      1 Package(s)         
+Update       0 Package(s)         
+Remove       0 Package(s)         
+
+Total download size: 705 k
+Downloading Packages:
+warning: rpmts_HdrFromFdno: Header V3 DSA signature: NOKEY, key ID 1e5e0159
+
+
+Public key for binutils-devel-2.17.50.0.6-12.el5.i386.rpm is not installed
+[root@ocp ~]# yum install compat* -y
+Loaded plugins: security
+Setting up Install Process
+Package compat-libgcc-296-2.96-138.i386 already installed and latest version
+Package compat-libstdc++-296-2.96-138.i386 already installed and latest version
+Package compat-libstdc++-33-3.2.3-61.i386 already installed and latest version
+Resolving Dependencies
+--> Running transaction check
+---> Package compat-dapl.i386 0:2.0.19-2.el5 set to be updated
+--> Processing Dependency: libibverbs.so.1(IBVERBS_1.1) for package: compat-dapl
+--> Processing Dependency: librdmacm.so.1 for package: compat-dapl
+--> Processing Dependency: librdmacm.so.1(RDMACM_1.0) for package: compat-dapl
+--> Processing Dependency: libibverbs.so.1 for package: compat-dapl
+--> Processing Dependency: libibverbs.so.1(IBVERBS_1.0) for package: compat-dapl
+---> Package compat-dapl-devel.i386 0:2.0.19-2.el5 set to be updated
+---> Package compat-dapl-static.i386 0:2.0.19-2.el5 set to be updated
+---> Package compat-dapl-utils.i386 0:2.0.19-2.el5 set to be updated
+---> Package compat-db.i386 0:4.2.52-5.1 set to be updated
+---> Package compat-gcc-34.i386 0:3.4.6-4 set to be updated
+---> Package compat-gcc-34-c++.i386 0:3.4.6-4 set to be updated
+---> Package compat-gcc-34-g77.i386 0:3.4.6-4 set to be updated
+---> Package compat-glibc.i386 1:2.3.4-2.26 set to be updated
+---> Package compat-glibc-headers.i386 1:2.3.4-2.26 set to be updated
+---> Package compat-libcom_err.i386 0:1.0-7 set to be updated
+---> Package compat-libf2c-34.i386 0:3.4.6-4 set to be updated
+---> Package compat-openldap.i386 0:2.3.43_2.2.29-3.el5 set to be updated
+---> Package compat-readline43.i386 0:4.3-3 set to be updated
+---> Package compat-slang.i386 0:1.4.9-27.2.2 set to be updated
+--> Running transaction check
+---> Package libibverbs.i386 0:1.1.2-4.el5 set to be updated
+--> Processing Dependency: openib >= 1.0 for package: libibverbs
+---> Package librdmacm.i386 0:1.0.8-5.el5 set to be updated
+--> Running transaction check
+---> Package openib.noarch 0:1.4.1-3.el5 set to be updated
+--> Finished Dependency Resolution
+
+Dependencies Resolved
+
+================================================================================
+ Package                  Arch       Version                    Repository
+                                                                           Size
+================================================================================
+Installing:
+ compat-dapl              i386       2.0.19-2.el5               local     115 k
+ compat-dapl-devel        i386       2.0.19-2.el5               local      31 k
+ compat-dapl-static       i386       2.0.19-2.el5               local     153 k
+ compat-dapl-utils        i386       2.0.19-2.el5               local      78 k
+ compat-db                i386       4.2.52-5.1                 local     1.7 M
+ compat-gcc-34            i386       3.4.6-4                    local     4.1 M
+ compat-gcc-34-c++        i386       3.4.6-4                    local      11 M
+ compat-gcc-34-g77        i386       3.4.6-4                    local     2.1 M
+ compat-glibc             i386       1:2.3.4-2.26               local     1.0 M
+ compat-glibc-headers     i386       1:2.3.4-2.26               local     485 k
+ compat-libcom_err        i386       1.0-7                      local     4.9 k
+ compat-libf2c-34         i386       3.4.6-4                    local      52 k
+ compat-openldap          i386       2.3.43_2.2.29-3.el5        local     258 k
+ compat-readline43        i386       4.3-3                      local     102 k
+ compat-slang             i386       1.4.9-27.2.2               local     200 k
+Installing for dependencies:
+ libibverbs               i386       1.1.2-4.el5                local      44 k
+ librdmacm                i386       1.0.8-5.el5                local      23 k
+ openib                   noarch     1.4.1-3.el5                local      20 k
+
+Transaction Summary
+================================================================================
+Install     18 Package(s)         
+Update       0 Package(s)         
+Remove       0 Package(s)         
+
+Total download size: 22 M
+Downloading Packages:
+--------------------------------------------------------------------------------
+Total                                           4.2 GB/s |  22 MB     00:00     
+warning: rpmts_HdrFromFdno: Header V3 DSA signature: NOKEY, key ID 1e5e0159
+
+
+Public key for compat-dapl-devel-2.0.19-2.el5.i386.rpm is not installed
+[root@ocp ~]# yum install elfutils* -y
+Loaded plugins: security
+Setting up Install Process
+Package elfutils-libs-0.137-3.el5.i386 already installed and latest version
+Package elfutils-libelf-devel-0.137-3.el5.i386 already installed and latest version
+Package elfutils-0.137-3.el5.i386 already installed and latest version
+Package elfutils-libelf-devel-static-0.137-3.el5.i386 already installed and latest version
+Package elfutils-libelf-0.137-3.el5.i386 already installed and latest version
+Resolving Dependencies
+--> Running transaction check
+---> Package elfutils-devel.i386 0:0.137-3.el5 set to be updated
+---> Package elfutils-devel-static.i386 0:0.137-3.el5 set to be updated
+--> Finished Dependency Resolution
+
+Dependencies Resolved
+
+================================================================================
+ Package                      Arch        Version            Repository    Size
+================================================================================
+Installing:
+ elfutils-devel               i386        0.137-3.el5        local         61 k
+ elfutils-devel-static        i386        0.137-3.el5        local        122 k
+
+Transaction Summary
+================================================================================
+Install      2 Package(s)         
+Update       0 Package(s)         
+Remove       0 Package(s)         
+
+Total download size: 183 k
+Downloading Packages:
+--------------------------------------------------------------------------------
+Total                                           214 MB/s | 183 kB     00:00     
+warning: rpmts_HdrFromFdno: Header V3 DSA signature: NOKEY, key ID 1e5e0159
+
+
+Public key for elfutils-devel-static-0.137-3.el5.i386.rpm is not installed
+[root@ocp ~]# yum install gcc* -y
+Loaded plugins: security
+Setting up Install Process
+Package gcc-4.1.2-46.el5.i386 already installed and latest version
+Package gcc-gfortran-4.1.2-46.el5.i386 already installed and latest version
+Package gcc-c++-4.1.2-46.el5.i386 already installed and latest version
+Resolving Dependencies
+--> Running transaction check
+---> Package gcc-gnat.i386 0:4.1.2-46.el5 set to be updated
+--> Processing Dependency: libgnat = 4.1.2-46.el5 for package: gcc-gnat
+--> Processing Dependency: libgnat-4.1.so for package: gcc-gnat
+--> Processing Dependency: libgnarl-4.1.so for package: gcc-gnat
+---> Package gcc-java.i386 0:4.1.2-46.el5 set to be updated
+--> Processing Dependency: libgcj-devel = 4.1.2-46.el5 for package: gcc-java
+---> Package gcc-objc.i386 0:4.1.2-46.el5 set to be updated
+--> Processing Dependency: libobjc = 4.1.2-46.el5 for package: gcc-objc
+--> Processing Dependency: libobjc.so.1 for package: gcc-objc
+---> Package gcc-objc++.i386 0:4.1.2-46.el5 set to be updated
+---> Package gcc44.i386 0:4.4.0-6.el5 set to be updated
+---> Package gcc44-c++.i386 0:4.4.0-6.el5 set to be updated
+--> Processing Dependency: libstdc++44-devel = 4.4.0-6.el5 for package: gcc44-c++
+---> Package gcc44-gfortran.i386 0:4.4.0-6.el5 set to be updated
+--> Processing Dependency: libgfortran44 = 4.4.0-6.el5 for package: gcc44-gfortran
+--> Processing Dependency: libgfortran.so.3 for package: gcc44-gfortran
+--> Running transaction check
+---> Package libgcj-devel.i386 0:4.1.2-46.el5 set to be updated
+local/filelists                                          | 2.3 MB     00:00     
+---> Package libgfortran44.i386 0:4.4.0-6.el5 set to be updated
+---> Package libgnat.i386 0:4.1.2-46.el5 set to be updated
+---> Package libobjc.i386 0:4.1.2-46.el5 set to be updated
+---> Package libstdc++44-devel.i386 0:4.4.0-6.el5 set to be updated
+--> Finished Dependency Resolution
+
+Dependencies Resolved
+
+================================================================================
+ Package                  Arch        Version                Repository    Size
+================================================================================
+Installing:
+ gcc-gnat                 i386        4.1.2-46.el5           local         11 M
+ gcc-java                 i386        4.1.2-46.el5           local        2.9 M
+ gcc-objc                 i386        4.1.2-46.el5           local        2.6 M
+ gcc-objc++               i386        4.1.2-46.el5           local        2.8 M
+ gcc44                    i386        4.4.0-6.el5            local        9.6 M
+ gcc44-c++                i386        4.4.0-6.el5            local        4.6 M
+ gcc44-gfortran           i386        4.4.0-6.el5            local        4.5 M
+Installing for dependencies:
+ libgcj-devel             i386        4.1.2-46.el5           local        1.4 M
+ libgfortran44            i386        4.4.0-6.el5            local        251 k
+ libgnat                  i386        4.1.2-46.el5           local        989 k
+ libobjc                  i386        4.1.2-46.el5           local        103 k
+ libstdc++44-devel        i386        4.4.0-6.el5            local        4.1 M
+
+Transaction Summary
+================================================================================
+Install     12 Package(s)         
+Update       0 Package(s)         
+Remove       0 Package(s)         
+
+Total download size: 45 M
+Downloading Packages:
+--------------------------------------------------------------------------------
+Total                                            11 GB/s |  45 MB     00:00     
+warning: rpmts_HdrFromFdno: Header V3 DSA signature: NOKEY, key ID 1e5e0159
+
+
+Public key for gcc-objc-4.1.2-46.el5.i386.rpm is not installed
+[root@ocp ~]# yum install glibc* -y
+Loaded plugins: security
+Setting up Install Process
+Package glibc-devel-2.5-42.i386 already installed and latest version
+Package glibc-2.5-42.i686 already installed and latest version
+Package glibc-headers-2.5-42.i386 already installed and latest version
+Package glibc-common-2.5-42.i386 already installed and latest version
+Resolving Dependencies
+--> Running transaction check
+---> Package glibc-utils.i386 0:2.5-42 set to be updated
+--> Finished Dependency Resolution
+
+Dependencies Resolved
+
+================================================================================
+ Package               Arch           Version             Repository       Size
+================================================================================
+Installing:
+ glibc-utils           i386           2.5-42              local           129 k
+
+Transaction Summary
+================================================================================
+Install      1 Package(s)         
+Update       0 Package(s)         
+Remove       0 Package(s)         
+
+Total download size: 129 k
+Downloading Packages:
+warning: rpmts_HdrFromFdno: Header V3 DSA signature: NOKEY, key ID 1e5e0159
+
+
+Public key for glibc-utils-2.5-42.i386.rpm is not installed
+[root@ocp ~]# yum install kernel* -y
+Loaded plugins: security
+Setting up Install Process
+Package kernel-headers-2.6.18-164.el5.i386 already installed and latest version
+Package kernel-PAE-devel-2.6.18-164.el5.i686 already installed and latest version
+Package kernel-PAE-2.6.18-164.el5.i686 already installed and latest version
+Resolving Dependencies
+--> Running transaction check
+---> Package kernel.i686 0:2.6.18-164.el5 set to be installed
+---> Package kernel-debug.i686 0:2.6.18-164.el5 set to be installed
+---> Package kernel-debug-devel.i686 0:2.6.18-164.el5 set to be updated
+---> Package kernel-devel.i686 0:2.6.18-164.el5 set to be installed
+---> Package kernel-doc.noarch 0:2.6.18-164.el5 set to be updated
+---> Package kernel-xen.i686 0:2.6.18-164.el5 set to be installed
+---> Package kernel-xen-devel.i686 0:2.6.18-164.el5 set to be installed
+--> Finished Dependency Resolution
+
+Dependencies Resolved
+
+================================================================================
+ Package                  Arch         Version                Repository   Size
+================================================================================
+Installing:
+ kernel                   i686         2.6.18-164.el5         local        16 M
+ kernel-debug             i686         2.6.18-164.el5         local        16 M
+ kernel-debug-devel       i686         2.6.18-164.el5         local       5.4 M
+ kernel-devel             i686         2.6.18-164.el5         local       5.3 M
+ kernel-doc               noarch       2.6.18-164.el5         local       3.0 M
+ kernel-xen               i686         2.6.18-164.el5         local        17 M
+ kernel-xen-devel         i686         2.6.18-164.el5         local       5.4 M
+
+Transaction Summary
+================================================================================
+Install      7 Package(s)         
+Update       0 Package(s)         
+Remove       0 Package(s)         
+
+Total download size: 68 M
+Downloading Packages:
+--------------------------------------------------------------------------------
+Total                                            24 GB/s |  68 MB     00:00     
+warning: rpmts_HdrFromFdno: Header V3 DSA signature: NOKEY, key ID 1e5e0159
+
+
+Public key for kernel-2.6.18-164.el5.i686.rpm is not installed
+[root@ocp ~]# yum install ksh* -y
+Loaded plugins: security
+Setting up Install Process
+Package ksh-20080202-14.el5.i386 already installed and latest version
+Nothing to do
+[root@ocp ~]# yum install libaio* -y
+Loaded plugins: security
+Setting up Install Process
+Package libaio-0.3.106-3.2.i386 already installed and latest version
+Resolving Dependencies
+--> Running transaction check
+---> Package libaio-devel.i386 0:0.3.106-3.2 set to be updated
+--> Finished Dependency Resolution
+
+Dependencies Resolved
+
+================================================================================
+ Package               Arch          Version               Repository      Size
+================================================================================
+Installing:
+ libaio-devel          i386          0.3.106-3.2           local           11 k
+
+Transaction Summary
+================================================================================
+Install      1 Package(s)         
+Update       0 Package(s)         
+Remove       0 Package(s)         
+
+Total download size: 11 k
+Downloading Packages:
+warning: rpmts_HdrFromFdno: Header V3 DSA signature: NOKEY, key ID 1e5e0159
+
+
+Public key for libaio-devel-0.3.106-3.2.i386.rpm is not installed
+[root@ocp ~]# yum install libgcc* -y
+Loaded plugins: security
+Setting up Install Process
+Package libgcc-4.1.2-46.el5.i386 already installed and latest version
+Nothing to do
+[root@ocp ~]# yum install libgomp* -y
+Loaded plugins: security
+Setting up Install Process
+Package libgomp-4.4.0-6.el5.i386 already installed and latest version
+Nothing to do
+[root@ocp ~]# yum install libstdc* -y
+Loaded plugins: security
+Setting up Install Process
+Package libstdc++-4.1.2-46.el5.i386 already installed and latest version
+Package libstdc++-devel-4.1.2-46.el5.i386 already installed and latest version
+Resolving Dependencies
+--> Running transaction check
+---> Package libstdc++44-devel.i386 0:4.4.0-6.el5 set to be updated
+--> Finished Dependency Resolution
+
+Dependencies Resolved
+
+================================================================================
+ Package                   Arch         Version             Repository     Size
+================================================================================
+Installing:
+ libstdc++44-devel         i386         4.4.0-6.el5         local         4.1 M
+
+Transaction Summary
+================================================================================
+Install      1 Package(s)         
+Update       0 Package(s)         
+Remove       0 Package(s)         
+
+Total download size: 4.1 M
+Downloading Packages:
+warning: rpmts_HdrFromFdno: Header V3 DSA signature: NOKEY, key ID 1e5e0159
+
+
+Public key for libstdc++44-devel-4.4.0-6.el5.i386.rpm is not installed
+[root@ocp ~]# yum install make* -y
+Loaded plugins: security
+Setting up Install Process
+Package 1:make-3.81-3.el5.i386 already installed and latest version
+Nothing to do
+[root@ocp ~]# yum install sysstat* -y
+Loaded plugins: security
+Setting up Install Process
+Resolving Dependencies
+--> Running transaction check
+---> Package sysstat.i386 0:7.0.2-3.el5 set to be updated
+--> Finished Dependency Resolution
+
+Dependencies Resolved
+
+================================================================================
+ Package           Arch           Version                 Repository       Size
+================================================================================
+Installing:
+ sysstat           i386           7.0.2-3.el5             local           170 k
+
+Transaction Summary
+================================================================================
+Install      1 Package(s)         
+Update       0 Package(s)         
+Remove       0 Package(s)         
+
+Total download size: 170 k
+Downloading Packages:
+warning: rpmts_HdrFromFdno: Header V3 DSA signature: NOKEY, key ID 1e5e0159
+
+
+Public key for sysstat-7.0.2-3.el5.i386.rpm is not installed
+[root@ocp ~]# yum install unixODBC* -y
+Loaded plugins: security
+Setting up Install Process
+Resolving Dependencies
+--> Running transaction check
+---> Package unixODBC.i386 0:2.2.11-7.1 set to be updated
+---> Package unixODBC-devel.i386 0:2.2.11-7.1 set to be updated
+---> Package unixODBC-kde.i386 0:2.2.11-7.1 set to be updated
+--> Finished Dependency Resolution
+
+Dependencies Resolved
+
+================================================================================
+ Package                 Arch          Version             Repository      Size
+================================================================================
+Installing:
+ unixODBC                i386          2.2.11-7.1          local          830 k
+ unixODBC-devel          i386          2.2.11-7.1          local          743 k
+ unixODBC-kde            i386          2.2.11-7.1          local          560 k
+
+Transaction Summary
+================================================================================
+Install      3 Package(s)         
+Update       0 Package(s)         
+Remove       0 Package(s)         
+
+Total download size: 2.1 M
+Downloading Packages:
+--------------------------------------------------------------------------------
+Total                                           486 MB/s | 2.1 MB     00:00     
+warning: rpmts_HdrFromFdno: Header V3 DSA signature: NOKEY, key ID 1e5e0159
+
+
+Public key for unixODBC-kde-2.2.11-7.1.i386.rpm is not installed
+[root@ocp ~]# yum install libcap* -y
+Loaded plugins: security
+Setting up Install Process
+Package libcap-1.10-26.i386 already installed and latest version
+Package libcap-devel-1.10-26.i386 already installed and latest version
+Nothing to do
+[root@ocp ~]# yum install -y compat-libcap1*
+Loaded plugins: security
+Setting up Install Process
+No package compat-libcap1* available.
+Nothing to do
+[root@ocp ~]# yum install -y compat-libstdc*
+Loaded plugins: security
+Setting up Install Process
+Package compat-libstdc++-296-2.96-138.i386 already installed and latest version
+Package compat-libstdc++-33-3.2.3-61.i386 already installed and latest version
+Nothing to do
+[root@ocp ~]# rpm -qa|grep compat-libstdc*
+compat-libstdc++-33-3.2.3-61
+compat-libstdc++-296-2.96-138
+[root@ocp ~]# rpm -qa|grep compat-libcap1
+[root@ocp ~]# 
+
+userdel oracle
+
+[root@ocp ~]# groupadd -g 1001 oinstall
+[root@ocp ~]# groupadd -g 1002 dba
+[root@ocp ~]# groupadd -g 1003 oper
+[root@ocp ~]# 
+[root@ocp ~]# useradd -u 1002 -g oinstall -G dba,oper oracle
+
+[root@ocp ~]# echo '192.168.96.128 ocp' >> /etc/hosts
+[root@ocp ~]# cat /etc/hosts
+# Do not remove the following line, or various programs
+# that require network functionality will fail.
+127.0.0.1               localhost.localdomain localhost
+::1             localhost6.localdomain6 localhost6
+192.168.96.128 ocp
+[root@ocp ~]# 
+
+echo 'kernel.shmall = 2097152'>>/etc/sysctl.conf  字节数属于4
+echo 'kernel.shmmax = 4294967295'>>/etc/sysctl.conf 
+
+分给oracle的内存
+
+echo 'fs.aio-max-nr = 1048576'>>/etc/sysctl.conf 
+echo 'fs.file-max = 6815744'>>/etc/sysctl.conf 
+echo 'kernel.shmall = 2097152'>>/etc/sysctl.conf 
+echo 'kernel.shmmax = 4294967295'>>/etc/sysctl.conf 
+echo 'kernel.shmmni = 4096'>>/etc/sysctl.conf 
+echo 'kernel.sem = 250 32000 100 128'>>/etc/sysctl.conf 
+echo 'net.ipv4.ip_local_port_range = 9000 65500'>>/etc/sysctl.conf 
+echo 'net.core.rmem_default = 262144'>>/etc/sysctl.conf 
+echo 'net.core.rmem_max = 4194304'>>/etc/sysctl.conf 
+echo 'net.core.wmem_default = 262144'>>/etc/sysctl.conf 
+echo 'net.core.wmem_max = 1048576'>>/etc/sysctl.conf 
+
+
+资源限制
+echo 'oracle soft nproc 2047'>>/etc/security/limits.conf
+echo 'oracle hard nproc 16384'>>/etc/security/limits.conf
+echo 'oracle soft nofile 1024'>>/etc/security/limits.conf
+echo 'oracle hard nofile 65536'>>/etc/security/limits.conf
+echo 'grid soft nproc 2047'>>/etc/security/limits.conf
+echo 'grid hard nproc 16384'>>/etc/security/limits.conf
+echo 'grid soft nofile 1024'>>/etc/security/limits.conf
+echo 'grid hard nofile 65536'>>/etc/security/limits.conf
+
+
+
+验证模块
+echo 'session required pam_limits.so'>>/etc/pam.d/login
+
+https://blog.csdn.net/jx_jy/article/details/12621453
+
+echo 'if [ $USER = "oracle" ] || [ $USER = "grid" ]; then '>>/etc/profile
+echo 'if [ $SHELL = "/bin/ksh" ]; then '>>/etc/profile
+echo 'ulimit -p 16384 '>>/etc/profile
+echo 'ulimit -n 65536 '>>/etc/profile
+echo 'else '>>/etc/profile 
+echo 'ulimit -u 16384 -n 65536 '>>/etc/profile
+echo 'fi  '>>/etc/profile
+echo 'umask 022 '>>/etc/profile
+echo 'fi '>>/etc/profile
+
+
+mkdir -p /u01/app/oraInventory
+chown -R oracle:oinstall /u01/app/oraInventory
+chmod -R 775 /u01/app/oraInventory
+
+
+
+mkdir -p /u01/app/oracle
+mkdir -p /u01/app/oracle/cfgtoollogs
+chown -R oracle:oinstall /u01/app/oracle 
+chmod -R 775 /u01/app/oracle
+
+
+
+chown -R oracle:oinstall /u01
+
+echo 'export ORACLE_SID=orcl' >> /home/oracle/.bash_profile
+echo 'export ORACLE_UNQNAME=orcl' >> /home/oracle/.bash_profile
+echo 'export ORACLE_BASE=/u01/app/oracle' >> /home/oracle/.bash_profile
+echo 'export ORACLE_HOME=$ORACLE_BASE/product/11.2.0/db_1' >> /home/oracle/.bash_profile
+echo 'export PATH=$ORACLE_HOME/bin:$PATH' >> /home/oracle/.bash_profile
+
+
+
+任意用户都可以访问linux的x windows(图形化界面)系统
+
+
+cp  -R /media/20130808_1608/database /tmp
+
+
+
+快速交易
+历史数据查询
+
+
+OLTP 
+OLAP
+
+oracle好在归档
+
+数据库有个中间件，session池，转发请求
+
+字符集创建数据库后不能修改
+数据库实例主进程
+[root@ocp ~]# ps -ef|grep smon
+oracle    9489     1  0 15:24 ?        00:00:00 ora_smon_orcl
+root     13388 13318  0 15:37 pts/1    00:00:00 grep smon
+[root@ocp ~]# 
+
+将数据库停了就是将smon kill
+
+mmon：
+
+pmon:内存资源调配
+
+
+[root@ocp ~]# find / -name orcl.sh
+/u01/app/oracle/admin/orcl/scripts/orcl.sh
+[root@ocp ~]# cat /u01/app/oracle/admin/orcl/scripts/orcl.sh
+#!/bin/sh
+
+OLD_UMASK=`umask`
+umask 0027
+mkdir -p /u01/app/oracle/admin/orcl/adump
+mkdir -p /u01/app/oracle/admin/orcl/dpdump
+mkdir -p /u01/app/oracle/admin/orcl/pfile
+mkdir -p /u01/app/oracle/cfgtoollogs/dbca/orcl
+mkdir -p /u01/app/oracle/fast_recovery_area
+mkdir -p /u01/app/oracle/fast_recovery_area/orcl
+mkdir -p /u01/app/oracle/oradata/orcl
+mkdir -p /u01/app/oracle/product/11.2.0/dbhome_1/dbs
+umask ${OLD_UMASK}
+ORACLE_SID=orcl; export ORACLE_SID
+PATH=$ORACLE_HOME/bin:$PATH; export PATH
+echo You should Add this entry in the /etc/oratab: orcl:/u01/app/oracle/product/11.2.0/dbhome_1:Y
+/u01/app/oracle/product/11.2.0/dbhome_1/bin/sqlplus /nolog @/u01/app/oracle/admin/orcl/scripts/orcl.sql
+[root@ocp ~]# 
+
+su - oracle
+生效.bash_profile
+
+
+
+[oracle@ocp root]$ alias ss='sqlplus / as sysdba'
+[oracle@ocp root]$ ss
+
+
+
+[oracle@ocp root]$ echo "alias ss='sqlplus / as sysdba'">>/home/oracle/.bash_profile 
+[oracle@ocp root]$ source ~oracle/.bash_profile 
+[oracle@ocp root]$ ss
+
+SQL*Plus: Release 11.2.0.3.0 Production on Sat Mar 2 15:52:55 2019
+
+Copyright (c) 1982, 2011, Oracle.  All rights reserved.
+
+
+Connected to:
+Oracle Database 11g Enterprise Edition Release 11.2.0.3.0 - Production
+With the Partitioning, OLAP, Data Mining and Real Application Testing options
+
+SQL> 
+
+[oracle@ocp admin]$ cat glogin.sql 
+--
+-- Copyright (c) 1988, 2011, Oracle and/or its affiliates. 
+-- All rights reserved. 
+--
+-- NAME
+--   glogin.sql
+--
+-- DESCRIPTION
+--   SQL*Plus global login "site profile" file
+--
+--   Add any SQL*Plus commands here that are to be executed when a
+--   user starts SQL*Plus, or uses the SQL*Plus CONNECT command.
+--
+-- USAGE
+--   This script is automatically run
+--
+
+set sqlprompt "_USER'@'_CONNECT_IDENTIFIER>"
+
+
+
+
+[oracle@ocp admin]$ ss
+
+SQL*Plus: Release 11.2.0.3.0 Production on Sat Mar 2 15:58:14 2019
+
+Copyright (c) 1982, 2011, Oracle.  All rights reserved.
+
+
+Connected to:
+Oracle Database 11g Enterprise Edition Release 11.2.0.3.0 - Production
+With the Partitioning, OLAP, Data Mining and Real Application Testing options
+
+SYS@orcl>
+
+
+windows上的文本文件拷贝到linux，有乱码，windows默认是docs type 
+
+[root@ocp ~]# dos2unix --help
+dos2unix Copyright (c) 1994-1995 Benjamin Lin
+         Copyright (c) 1998      Bernd Johannes Wuebben (Version 3.0)
+         Copyright (c) 1998      Christian Wurll (Version 3.1)
+Usage: dos2unix [-hkqV] [-c convmode] [-o file ...] [-n infile outfile ...]
+ -h --help        give this help
+ -k --keepdate    keep output file date
+ -q --quiet       quiet mode, suppress all warnings
+                  always on in stdin->stdout mode
+ -V --version     display version number
+ -c --convmode    conversion mode
+ convmode         ASCII, 7bit, ISO, Mac, default to ASCII
+ -l --newline     add additional newline in all but Mac convmode
+ -o --oldfile     write to old file
+ file ...         files to convert in old file mode
+ -n --newfile     write to new file
+ infile           original file in new file mode
+ outfile          output file in new file mode
+[root@ocp ~]# 
+
+
+init 0 关机
+
+
+
+[root@ocp ~]# ps -ef|grep orcl
+oracle   30208     1  0 10:46 ?        00:00:00 ora_pmon_orcl
+oracle   30210     1  0 10:46 ?        00:00:00 ora_psp0_orcl
+oracle   30212     1  0 10:46 ?        00:00:00 ora_vktm_orcl
+oracle   30216     1  0 10:46 ?        00:00:00 ora_gen0_orcl
+oracle   30218     1  0 10:46 ?        00:00:00 ora_diag_orcl
+oracle   30220     1  0 10:46 ?        00:00:00 ora_dbrm_orcl
+oracle   30222     1  0 10:46 ?        00:00:00 ora_dia0_orcl
+oracle   30224     1  0 10:46 ?        00:00:05 ora_mman_orcl
+oracle   30226     1  0 10:46 ?        00:00:00 ora_dbw0_orcl
+oracle   30228     1  0 10:46 ?        00:00:02 ora_lgwr_orcl
+oracle   30230     1  0 10:46 ?        00:00:00 ora_ckpt_orcl
+oracle   30232     1  0 10:46 ?        00:00:00 ora_smon_orcl
+oracle   30234     1  0 10:46 ?        00:00:00 ora_reco_orcl
+oracle   30236     1  0 10:46 ?        00:00:00 ora_mmon_orcl
+oracle   30238     1  0 10:46 ?        00:00:00 ora_mmnl_orcl
+oracle   30240     1  0 10:46 ?        00:00:00 ora_d000_orcl
+oracle   30242     1  0 10:46 ?        00:00:00 ora_s000_orcl
+oracle   30291     1  0 10:46 ?        00:00:00 ora_qmnc_orcl
+oracle   30305     1  0 10:46 ?        00:00:00 ora_cjq0_orcl
+oracle   30307     1  0 10:46 ?        00:00:00 ora_vkrm_orcl
+oracle   30319     1  0 10:46 ?        00:00:00 ora_q000_orcl
+oracle   30321     1  0 10:46 ?        00:00:00 ora_q001_orcl
+oracle   30341     1  0 10:47 ?        00:00:00 ora_smco_orcl
+oracle   31032     1  0 11:47 ?        00:00:00 ora_w000_orcl
+oracle   31104     1  0 11:56 ?        00:00:00 ora_j000_orcl
+oracle   31106     1  0 11:56 ?        00:00:00 ora_j001_orcl
+root     31134 31111  0 11:57 pts/1    00:00:00 grep orcl
+
+[root@ocp ~]# kill -9 30232
+[root@ocp ~]# ps -ef|grep smon
+root     31149 31111  0 11:58 pts/1    00:00:00 grep smon
+[root@ocp ~]# ps -ef|grep orcl
+root     31151 31111  0 11:58 pts/1    00:00:00 grep orcl
+[root@ocp ~]# su - oracle
+[oracle@ocp ~]$ sqlplus / as sysdba
+
+SQL*Plus: Release 11.2.0.3.0 Production on Sat Mar 9 11:59:29 2019
+
+Copyright (c) 1982, 2011, Oracle.  All rights reserved.
+
+Connected to an idle instance.
+
+SYS@orcl>startup
+ORACLE instance started.
+
+Total System Global Area 1707446272 bytes
+Fixed Size                  1345408 bytes
+Variable Size            1006635136 bytes
+Database Buffers          687865856 bytes
+Redo Buffers               11599872 bytes
+Database mounted.
+Database opened.
+SYS@orcl>
+
+
+ps -ef|grep orcl所有进程都在startup启动数据库时开辟的内存里
+
+
+所有增删改查操作都是在内存里面的
+
+
+
+
+
+
+
+
