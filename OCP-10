@@ -1,0 +1,828 @@
+rman之前，数据库要开启归档模式
+要改动的数据有记录redo
+被改动的数据有记录flashback
+改动持久化 归档
+SGA:实例内存
+
+
+本地 rman username/12345
+远程 rman username/12345@tnsname
+
+可以配置1-31个归档路径
+
+SQL> show parameter archive
+
+NAME				     TYPE	 VALUE
+------------------------------------ ----------- ------------------------------
+archive_lag_target		     integer	 0
+log_archive_config		     string
+log_archive_dest		     string
+log_archive_dest_1		     string	 location=/u01/app/oracle/arch
+log_archive_dest_10		     string
+log_archive_dest_11		     string
+log_archive_dest_12		     string
+log_archive_dest_13		     string
+log_archive_dest_14		     string
+log_archive_dest_15		     string
+log_archive_dest_16		     string
+
+NAME				     TYPE	 VALUE
+------------------------------------ ----------- ------------------------------
+log_archive_dest_17		     string
+log_archive_dest_18		     string
+log_archive_dest_19		     string
+log_archive_dest_2		     string
+log_archive_dest_20		     string
+log_archive_dest_21		     string
+log_archive_dest_22		     string
+log_archive_dest_23		     string
+log_archive_dest_24		     string
+log_archive_dest_25		     string
+log_archive_dest_26		     string
+
+NAME				     TYPE	 VALUE
+------------------------------------ ----------- ------------------------------
+log_archive_dest_27		     string
+log_archive_dest_28		     string
+log_archive_dest_29		     string
+log_archive_dest_3		     string
+log_archive_dest_30		     string
+log_archive_dest_31		     string
+log_archive_dest_4		     string
+log_archive_dest_5		     string
+log_archive_dest_6		     string
+log_archive_dest_7		     string
+log_archive_dest_8		     string
+
+
+
+设置归档目录
+alter system set log_archive_dest_1='location=/u01/app/oracle/arch' SCOPE=BOTH;
+
+
+
+修改归档要重启，是因为和和内存对接，重启进程
+
+
+机器出问题，
+
+实例启动：3个阶段，4个状态
+加载参数文件，
+
+
+实例化：
+nomount：
+读参数文件（300多个参数）
+相关进程在内存跑起来 
+内存初始化，加载进程
+
+
+
+mount：
+控制文件对接（时间戳，实例和数据文件的对接）
+
+
+open：.
+
+
+
+
+open之后可以有的状态
+readonly:
+restrict:只有sys用户可以连 
+
+
+
+
+
+
+
+
+
+
+
+数据库有几个状态：
+nomount mount open 
+
+数据库排错都在mount状态
+
+数据库坏在数据文件，控制文件，数据文件，日志文件，
+
+
+修复数据库都在mount状态下面
+
+
+
+
+
+
+
+alter database archivelog;
+
+database三个单词
+
+system四个以上单词
+
+
+
+
+archivelog可以切
+
+切时间戳
+alter system checkpoint;
+archive log list;
+
+切日志的命令:
+
+alter system switch logfile;切换日志组
+archive log list;
+
+
+
+
+alter system archive log current;切换归档日志
+archive log list;
+
+
+
+LGWR
+
+切redo就划到归档
+
+
+数据备份是为了：
+介质恢复
+
+
+
+数据转储
+
+恢复操作步骤，定期演练
+
+
+
+rman
+
+recovery manage
+
+
+备份模式：
+冷备份 关库，把数据文件日志文件控制文件都拷贝一份，前提是正常关库
+
+热备份 rman工具
+
+全备
+
+增量备份
+
+
+rman target system/12345;
+backup database;
+
+select flashback_on from v$database;
+
+SQL> show parameter recovery
+
+NAME				     TYPE	 VALUE
+------------------------------------ ----------- ------------------------------
+db_recovery_file_dest		     string	 /u01/app/oracle/flash_recovery_area
+db_recovery_file_dest_size	     big integer 3882M
+recovery_parallelism		     integer	 0
+
+
+
+备份集，备份片
+
+
+
+list backup;
+
+
+
+delete obsolete（过期）
+
+
+
+检查备份信息
+备份都在控制文件有记录的
+RMAN> crosscheck backup;
+
+using channel ORA_DISK_1
+crosschecked backup piece: found to be 'EXPIRED'
+backup piece handle=/u01/app/oracle/flash_recovery_area/ORCL/backupset/2019_06_02/o1_mf_nnndf_TAG20190602T102826_gh6f2bdf_.bkp RECID=1 STAMP=1009880906
+crosschecked backup piece: found to be 'EXPIRED'
+backup piece handle=/u01/app/oracle/flash_recovery_area/ORCL/backupset/2019_06_02/o1_mf_ncsnf_TAG20190602T102826_gh6f3663_.bkp RECID=2 STAMP=1009880934
+Crosschecked 2 objects
+
+
+
+RMAN> list expired backup;
+
+
+
+RMAN> DELETE EXPIRED BACKUP;
+
+
+
+
+
+
+RMAN> report obsolete;
+RMAN> delete obsolete;
+RMAN> report obsolete;
+
+RMAN> delete backup;
+RMAN> list backup;
+RMAN> crosscheck backup;
+RMAN> DELETE EXPIRED BACKUP;
+
+
+把备份文件注册到rman
+
+catalog start with '/u01/app/oracle/fast_recovery_area/ORCL/backupset/intbk';
+
+
+RMAN> show all;
+
+RMAN configuration parameters for database with db_unique_name ORCL are:
+CONFIGURE RETENTION POLICY TO REDUNDANCY 1; # default
+CONFIGURE BACKUP OPTIMIZATION OFF; # default
+CONFIGURE DEFAULT DEVICE TYPE TO DISK; # default
+CONFIGURE CONTROLFILE AUTOBACKUP OFF; # default
+CONFIGURE CONTROLFILE AUTOBACKUP FORMAT FOR DEVICE TYPE DISK TO '%F'; # default
+CONFIGURE DEVICE TYPE DISK PARALLELISM 1 BACKUP TYPE TO BACKUPSET; # default
+CONFIGURE DATAFILE BACKUP COPIES FOR DEVICE TYPE DISK TO 1; # default
+CONFIGURE ARCHIVELOG BACKUP COPIES FOR DEVICE TYPE DISK TO 1; # default
+CONFIGURE MAXSETSIZE TO UNLIMITED; # default
+CONFIGURE ENCRYPTION FOR DATABASE OFF; # default
+CONFIGURE ENCRYPTION ALGORITHM 'AES128'; # default
+CONFIGURE COMPRESSION ALGORITHM 'BASIC' AS OF RELEASE 'DEFAULT' OPTIMIZE FOR LOAD TRUE ; # default
+CONFIGURE ARCHIVELOG DELETION POLICY TO NONE; # default
+CONFIGURE SNAPSHOT CONTROLFILE NAME TO '/u01/app/oracle/product/11.2.0/db_1/dbs/snapcf_orcl.f'; # default
+
+
+
+
+RMAN> backup as backupset database;
+
+RMAN> backup as copy database;  备份出来是单个的数据文件，不打包的，相当于冷备份
+
+
+
+
+备份的时候切一下日志：是为了数据文件控制文件日志文件时间戳一致
+
+
+备份期间有数据进来
+备份期间数据进来的问题，或许会写数据文件，或日志文件
+切日志，进来的数据会写日志
+
+
+rman的恢复都是在mount状态下恢复的。
+
+backup database format '/home/oracle/%d_%U.full';
+
+
+
+rman参数修改
+
+
+show all；
+
+一定要释放通道
+RMAN> release channel
+
+RMAN> configure controlfile autobackup on;
+
+new RMAN configuration parameters:
+CONFIGURE CONTROLFILE AUTOBACKUP ON;
+new RMAN configuration parameters are successfully stored
+
+RMAN> configure default device type to '/home/oracle/%D_%U.bk';
+
+new RMAN configuration parameters:
+CONFIGURE DEFAULT DEVICE TYPE TO '/HOME/ORACLE/%D_%U.BK';
+new RMAN configuration parameters are successfully stored
+released channel: ORA_DISK_1
+
+
+RMAN> CONFIGURE DEFAULT DEVICE TYPE clear
+
+要想备份快就分片channel
+压缩备份，并不优化，有压缩算法，比平常时间长，只是节省存储空间
+RMAN> backup as compressed backupset database;
+
+Starting backup at 02-JUN-19
+allocated channel: ORA_DISK_1
+channel ORA_DISK_1: SID=39 device type=DISK
+channel ORA_DISK_1: starting compressed full datafile backup set
+channel ORA_DISK_1: specifying datafile(s) in backup set
+input datafile file number=00005 name=/u01/app/oracle/oradata/orcl/huan1.dbf
+input datafile file number=00001 name=/u01/app/oracle/oradata/orcl/system01.dbf
+input datafile file number=00002 name=/u01/app/oracle/oradata/orcl/sysaux01.dbf
+input datafile file number=00003 name=/u01/app/oracle/oradata/orcl/undotbs01.dbf
+input datafile file number=00004 name=/u01/app/oracle/oradata/orcl/users01.dbf
+channel ORA_DISK_1: starting piece 1 at 02-JUN-19
+
+
+
+
+
+
+
+
+
+
+查看信息
+show/list/report xxx
+
+查看数据库信息
+report schema
+
+
+
+
+
+
+只备份指定文件/指定表空间
+backup datafile 1
+
+backup tablespace system;
+
+obsolete是针对冗余备份
+expired针对丢失的，损坏的备份
+
+
+
+
+list backup;
+
+
+
+
+
+
+
+BS Key  Type LV Size       Device Type Elapsed Time Completion Time
+------- ---- -- ---------- ----------- ------------ ---------------
+13      Full    9.36M      DISK        00:00:00     02-JUN-19      
+        BP Key: 13   Status: AVAILABLE  Compressed: NO  Tag: TAG20190602T113033
+        Piece Name: /u01/app/oracle/flash_recovery_area/ORCL/autobackup/2019_06_02/o1_mf_s_1009884633_gh6jpssy_.bkp
+  SPFILE Included: Modification time: 02-JUN-19
+  SPFILE db_unique_name: ORCL
+  Control File Included: Ckp SCN: 1044009      Ckp time: 02-JUN-19
+
+RMAN> delete backup tag 'TAG20190602T113033';
+
+using channel ORA_DISK_1
+
+List of Backup Pieces
+BP Key  BS Key  Pc# Cp# Status      Device Type Piece Name
+------- ------- --- --- ----------- ----------- ----------
+13      13      1   1   AVAILABLE   DISK        /u01/app/oracle/flash_recovery_area/ORCL/autobackup/2019_06_02/o1_mf_s_1009884633_gh6jpssy_.bkp
+
+Do you really want to delete the above objects (enter YES or NO)? yes
+deleted backup piece
+backup piece handle=/u01/app/oracle/flash_recovery_area/ORCL/autobackup/2019_06_02/o1_mf_s_1009884633_gh6jpssy_.bkp RECID=13 STAMP=1009884633
+Deleted 1 objects
+
+
+RMAN> 
+
+
+EOF代表输入
+
+
+rman target / << EOF
+run{
+backup database format '/home/oracle/bak/%d_%U.full';
+sql 'alter system archivelog current';
+backup archivelog all format '/home/oracle/bak/%d_%U.arc' delete input;
+backup current controlfile format '/home/oracle/bak/%d_%U.ctl';
+}
+EOF
+
+
+
+
+
+
+
+
+
+list backup;
+delete backup;
+
+
+恢复步骤：
+restore:拷贝数据文件
+recovery：追日志打时间戳
+
+oracle 重启，mount状态修复
+sqlplus> startup force;
+SQL> select status from v$instance;
+
+STATUS
+------------
+MOUNTED
+
+
+RMAN> restore datafile 5;
+
+RMAN> recover datafile 5
+
+
+
+RMAN> list failure;
+RMAN> advise failure;
+
+
+
+
+
+系统表空间挂了
+rm -rf system01.dbf
+
+
+select status from v$instance;
+
+删除system01.dbf
+mount下面修复
+advise failure;
+repair failure;
+
+
+
+
+
+
+RMAN> list failure;
+
+using target database control file instead of recovery catalog
+List of Database Failures
+=========================
+
+Failure ID Priority Status    Time Detected Summary
+---------- -------- --------- ------------- -------
+1142       CRITICAL OPEN      02-JUN-19     System datafile 1: '/u01/app/oracle/oradata/orcl/system01.dbf' is missing
+
+
+
+
+
+RMAN> advise failure;
+
+List of Database Failures
+=========================
+
+Failure ID Priority Status    Time Detected Summary
+---------- -------- --------- ------------- -------
+1142       CRITICAL OPEN      02-JUN-19     System datafile 1: '/u01/app/oracle/oradata/orcl/system01.dbf' is missing
+
+analyzing automatic repair options; this may take some time
+allocated channel: ORA_DISK_1
+channel ORA_DISK_1: SID=20 device type=DISK
+analyzing automatic repair options complete
+
+Mandatory Manual Actions
+========================
+no manual actions available
+
+Optional Manual Actions
+=======================
+1. If file /u01/app/oracle/oradata/orcl/system01.dbf was unintentionally renamed or moved, restore it
+
+Automated Repair Options
+========================
+Option Repair Description
+------ ------------------
+1      Restore and recover datafile 1  
+  Strategy: The repair includes complete media recovery with no data loss
+  Repair script: /u01/app/oracle/diag/rdbms/orcl/orcl/hm/reco_2538417079.hm
+
+RMAN> repair failure;
+
+Strategy: The repair includes complete media recovery with no data loss
+Repair script: /u01/app/oracle/diag/rdbms/orcl/orcl/hm/reco_2538417079.hm
+
+contents of repair script:
+   # restore and recover datafile
+   restore datafile 1;
+   recover datafile 1;
+
+Do you really want to execute the above repair (enter YES or NO)? yes
+executing repair script
+
+Starting restore at 02-JUN-19
+using channel ORA_DISK_1
+
+channel ORA_DISK_1: starting datafile backup set restore
+channel ORA_DISK_1: specifying datafile(s) to restore from backup set
+channel ORA_DISK_1: restoring datafile 00001 to /u01/app/oracle/oradata/orcl/system01.dbf
+channel ORA_DISK_1: reading from backup piece /home/oracle/bak/ORCL_1eu33a0g_1_1.full
+channel ORA_DISK_1: piece handle=/home/oracle/bak/ORCL_1eu33a0g_1_1.full tag=TAG20190602T121408
+channel ORA_DISK_1: restored backup piece 1
+channel ORA_DISK_1: restore complete, elapsed time: 00:00:15
+Finished restore at 02-JUN-19
+
+Starting recover at 02-JUN-19
+using channel ORA_DISK_1
+
+starting media recovery
+media recovery complete, elapsed time: 00:00:00
+
+Finished recover at 02-JUN-19
+repair failure complete
+
+Do you want to open the database (enter YES or NO)? yes
+database opened
+
+
+
+[root@11g orcl]# rm -rf ./*.dbf
+
+
+前提：全备+autobackup;
+RMAN> backup database;
+RMAN> show all
+CONFIGURE CONTROLFILE AUTOBACKUP ON;
+
+
+
+rm -rf *.dbf，执行irp+commit;不会报错
+增删改查是在内存里面进行和数据文件无关
+
+数据文件丢失
+
+数据库崩溃不要杀进程，实例在活着
+
+sql> alter database nomount;
+RMAN>restore controlfile from autobackup;
+RMAN> alter database mount;
+RMAN>restore database;根据控制文件去找数据文件
+RMAN>recover database;--数据库故障时的产生的数据，在归档日志里面，追日志
+RMAN>alter database open resetlogs;
+
+
+控制文件记录的是时间戳（时间戳，实例和数据文件的时间戳）
+备份信息记录在控制文件。
+
+nomount：加载数据文件
+
+mount：加载控制文件
+
+[oracle@11g ~]$ cd /u01/app/oracle/product/11.2.0/db_1/dbs/
+[oracle@11g dbs]$ ls
+hc_DBUA0.dat  init.ora  orapworcl      spfileorcl.ora
+hc_orcl.dat   lkORCL    snapcf_orcl.f
+[oracle@11g dbs]$ ps -ef| grep smon
+oracle     5023      1  0 12:28 ?        00:00:00 ora_smon_orcl
+oracle     5278   4389  0 12:46 pts/1    00:00:00 grep smon
+
+
+
+
+
+[oracle@11g ~]$ echo $ORACLE_SID
+orcl
+[oracle@11g ~]$ cd /u01/app/oracle/product/11.2.0/db_1/dbs/
+
+[oracle@11g dbs]$ ls
+hc_DBUA0.dat  init.ora  orapworcl      spfileorcl.ora
+hc_orcl.dat   lkORCL    snapcf_orcl.f
+
+[oracle@11g dbs]$ ps -ef| grep smon
+oracle     5023      1  0 12:28 ?        00:00:00 ora_smon_orcl
+oracle     5278   4389  0 12:46 pts/1    00:00:00 grep smon
+
+[oracle@11g dbs]$ kill -9 5023
+
+
+
+
+[oracle@11g dbs]$ sqlplus / as sysdba
+SQL> startup nomount 
+
+
+
+
+
+[oracle@11g ~]$ rman target /
+
+RMAN> restore controlfile from autobackup;
+
+RMAN> alter database mount;
+
+RMAN> restore database;
+
+RMAN> recover database;
+
+RMAN> alter database open resetlogs;
+
+
+数据库坏了
+ddl恢复不了
+force logging,那ddl可以恢复
+
+
+
+
+
+
+删除控制文件，手动重建控制文件
+
+控制文件恢复
+
+SQL> create tablespace tools datafile '/u01/app/oracle/oradata/orcl/tools.dbf' size 20M;
+
+Tablespace created.
+
+SQL> create table new_test as select * from dba_objects;
+
+Table created.
+
+SQL> alter table new_test move tablespace tools;
+
+Table altered.
+
+
+./rman.sh
+
+
+
+SQL> show parameter control
+
+NAME				     TYPE	 VALUE
+------------------------------------ ----------- ------------------------------
+control_file_record_keep_time	     integer	 7
+control_files			     string	 /u01/app/oracle/oradata/orcl/c
+						 ontrol01.ctl, /u01/app/oracle/
+						 flash_recovery_area/orcl/contr
+						 ol02.ctl
+control_management_pack_access	     string	 DIAGNOSTIC+TUNING
+
+
+
+
+rm -rf /u01/app/oracle/oradata/orcl/control01.ctl
+rm -rf /u01/app/oracle/flash_recovery_area/orcl/control02.ctl
+
+只要是数据库里面的注册的dbf都要写到datafile后面
+startup nomount;
+CREATE CONTROLFILE REUSE DATABASE orcl NORESETLOGS  ARCHIVELOG MAXLOGFILES 16 MAXLOGMEMBERS 3 MAXDATAFILES 100 MAXINSTANCES 8 MAXLOGHISTORY 292
+LOGFILE
+  GROUP 1 '/u01/app/oracle/oradata/orcl/redo01.log'  SIZE 50M,
+  GROUP 2 '/u01/app/oracle/oradata/orcl/redo02.log'  SIZE 50M,
+  GROUP 3 '/u01/app/oracle/oradata/orcl/redo03.log'  SIZE 50M
+DATAFILE
+  '/u01/app/oracle/oradata/orcl/system01.dbf',
+  '/u01/app/oracle/oradata/orcl/sysaux01.dbf',
+  '/u01/app/oracle/oradata/orcl/users01.dbf',
+  '/u01/app/oracle/oradata/orcl/undotbs01.dbf',
+  '/u01/app/oracle/oradata/orcl/tools.dbf',
+  '/u01/app/oracle/oradata/orcl/huan1.dbf'
+CHARACTER SET ZHS16GBK
+; 
+
+
+startup mount;
+alter database open;
+recover database;
+alter database open;
+
+
+alter database open resetlogs;
+
+
+
+
+数据文件坏了，日志坏了，建新的控制文件切过去就好。
+
+---
+
+切数据库(switch database to copy;)
+
+
+
+backup as copy database format '/home/oracle/bk/%d_%U.dbf'; 
+
+
+
+RMAN> shutdown immediate;
+
+using target database control file instead of recovery catalog
+database closed
+database dismounted
+Oracle instance shut down
+
+RMAN> startup mount;
+
+
+RMAN> switch database to copy;
+
+
+
+RMAN> alter database open;
+
+
+RMAN> recover database;
+
+
+
+RMAN> alter database open;
+
+database opened
+
+
+
+
+
+[oracle@11g ~]$ sqlplus / as sysdba
+
+SQL*Plus: Release 11.2.0.1.0 Production on Sun Jun 2 13:31:32 2019
+
+Copyright (c) 1982, 2009, Oracle.  All rights reserved.
+
+
+Connected to:
+Oracle Database 11g Enterprise Edition Release 11.2.0.1.0 - 64bit Production
+With the Partitioning, OLAP, Data Mining and Real Application Testing options
+
+SQL> select file_name from dba_data_files;
+
+FILE_NAME
+--------------------------------------------------------------------------------
+/home/oracle/bk/ORCL_data_D-ORCL_I-1537483346_TS-HUAN1_FNO-5_01u33e6p.dbf
+/home/oracle/bk/ORCL_data_D-ORCL_I-1537483346_TS-TOOLS_FNO-6_05u33e73.dbf
+/home/oracle/bk/ORCL_data_D-ORCL_I-1537483346_TS-UNDOTBS1_FNO-3_04u33e72.dbf
+/home/oracle/bk/ORCL_data_D-ORCL_I-1537483346_TS-USERS_FNO-4_07u33e75.dbf
+/home/oracle/bk/ORCL_data_D-ORCL_I-1537483346_TS-SYSAUX_FNO-2_03u33e6v.dbf
+/home/oracle/bk/ORCL_data_D-ORCL_I-1537483346_TS-SYSTEM_FNO-1_02u33e6s.dbf
+
+6 rows selected.
+
+
+
+--删除控制文件，数据文件，日志文件
+
+文件夹同步，批量部署会用
+[root@11g ~]# rsync -ar /u01/app/oracle/oradata/orcl /u02/orcl
+[root@11g ~]# ls /u02/orcl/
+orcl
+[root@11g ~]# ls /u02/orcl/orcl/
+control01.ctl  redo01.log  redo03.log    system01.dbf  tools.dbf      users01.dbf
+huan1.dbf      redo02.log  sysaux01.dbf  temp01.dbf    undotbs01.dbf
+[root@11g ~]# ll /u02/orcl/orcl/
+total 2303680
+-rw-r----- 1 oracle oinstall  10076160 Jun  2 13:39 control01.ctl
+-rw-r----- 1 oracle oinstall 838868992 Jun  2 13:29 huan1.dbf
+-rw-r----- 1 oracle oinstall  52429312 Jun  2 13:30 redo01.log
+-rw-r----- 1 oracle oinstall  52429312 Jun  2 13:38 redo02.log
+-rw-r----- 1 oracle oinstall  52429312 Jun  2 13:30 redo03.log
+-rw-r----- 1 oracle oinstall 513810432 Jun  2 13:29 sysaux01.dbf
+-rw-r----- 1 oracle oinstall 713039872 Jun  2 13:29 system01.dbf
+-rw-r----- 1 oracle oinstall  20979712 Jun  2 12:50 temp01.dbf
+-rw-r----- 1 oracle oinstall  20979712 Jun  2 13:29 tools.dbf
+-rw-r----- 1 oracle oinstall  78651392 Jun  2 13:29 undotbs01.dbf
+-rw-r----- 1 oracle oinstall   5251072 Jun  2 13:29 users01.dbf
+[root@11g ~]# 
+
+
+cd /u01/app/oracle/oradata/orcl
+[oracle@11g orcl]$ rm -rf temp*
+[oracle@11g orcl]$ rm -rf un*
+[oracle@11g orcl]$ rm -rf control01.ctl 
+
+
+[oracle@11g db_1]$ cd $ORACLE_HOME/dbs
+[oracle@11g dbs]$ rm -rf *orcl*
+[oracle@11g dbs]$ ls
+hc_DBUA0.dat  init.ora  lkORCL
+[oracle@11g dbs]$ rm -rf lkORCL 
+
+数据库启动读取这里参数
+/u01/app/oracle/product/11.2.0/db_1/dbs
+spfileorcl.ora
+vim initorcl.ora，自己编辑这个文件用于数据库启动
+
+
+
+
+进入dbs目录
+SQL>startup nomount pfile=initorcl.ora
+
+建空库
+create database character set al32utf8 extent management local;
+
+cd /u02/new/ORCL/datafile
+
+只要数据文件在，就可以恢复
+
+
+
+rm -rf *.dbf
+sql> alter database mount;
+RMAN> restore controlfile from autobackup;
+RMAN> restore database;--根据控制文件去找数据文件
+RMAN> recover database;--数据库故障时的产生的数据，在归档日志里面，追日志
+RMAN> alter database open resetlogs;--归档是逻辑的恢复，时间戳不一样的
